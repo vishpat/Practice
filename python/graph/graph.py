@@ -42,39 +42,62 @@ class DrawPanel(wx.Panel):
         self.grid_size = grid_size
         self.graph = Graph(self.grid_size)
 
-    def draw_edge(node1, node2, length):
+    def get_dimensions(self):
+        rect = self.GetClientRect()
+        side = min(rect.width, rect.height)
+        side = 0.9 * side;
+ 
+        startx = (rect.width - side) / 2;
+        starty = (rect.height - side) / 2;
+
+        return startx, starty, side
+
+    def draw_edge(self, node1, node2, cell_side):
+        dc = wx.PaintDC(self)
+ 
         x1, y1 = node1
         x2, y2 = node2
 
+        startx, starty, side = self.get_dimensions() 
+ 
         if x1 == x2 and y1 == y2:
             return
         
         if abs(x1 - x2) > 1 or abs(y1 - y2) > 1:
             return
 
-             
+        if abs(x1 - x2) == 1:
+            x = max(x1, x2)
+            lx1 = startx + x*cell_side
+            ly1 = starty + y1*cell_side
+            lx2 = startx + x*cell_side
+            ly2 = starty + (y1 + 1)*cell_side
+            dc.DrawLine(lx1, ly1, lx2, ly2)
+
+        if abs(y1 - y2) == 1:
+            y = max(y1, y2)
+            lx1 = startx + x1*cell_side
+            ly1 = starty + y*cell_side
+            lx2 = startx + (x1 + 1)*cell_side
+            ly2 = starty + y*cell_side
+            dc.DrawLine(lx1, ly1, lx2, ly2)
 
     def OnPaint(self, event=None):
         dc = wx.PaintDC(self)
         dc.Clear()
-        
-        rect = self.GetClientRect()
-        side = min(rect.width, rect.height)
-        side = 0.9 * side;
- 
         dc.SetPen(wx.Pen(wx.BLACK, 2))
 
-        rect_startx = (rect.width - side) / 2;
-        rect_starty = (rect.height - side) / 2;
-       
-        dc.DrawRectangle(rect_startx, rect_starty, side, side)
+        startx, starty, side = self.get_dimensions() 
+        dc.DrawRectangle(startx, starty, side, side)
 
         cell_side = side / self.grid_size
 
         for node in self.graph.adj_list.keys():
+            x, y = node
             neighbours = self.graph.adj_list[node]
-            for nieghbour in neighbours:
+            for neighbour in neighbours:
                 self.draw_edge(node, neighbour, cell_side)
+
 
 class GraphWindow(wx.Frame):
 
