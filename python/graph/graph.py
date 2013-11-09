@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import wx
+import random
+import itertools
 
 length = 600
 
@@ -32,7 +34,43 @@ class Graph:
                 neighbours.append((x, y + 1))
             
             self.adj_list[node] = neighbours
-    
+   
+    def spanning_tree_using_prims(self):
+        tree_edges = list()
+        tree_nodes = list()
+        node_cnt = len(self.adj_list.keys())
+ 
+        start_node = random.choice(self.adj_list.keys())
+        next_node = random.choice(self.adj_list[start_node])
+        
+        tree_edges.append((start_node, next_node))
+        tree_nodes.append(start_node)
+        tree_nodes.append(next_node)
+
+        while (len(tree_edges) < (len(self.adj_list.keys()) - 1)):
+
+            edges = list()
+            for edge in tree_edges:
+                for node in edge:
+                    neighbours = self.adj_list[node]
+                    for neighbour in neighbours:
+                        
+                        if neighbour in tree_nodes:
+                            continue
+
+                        cur_edge = (node, neighbour) 
+                        edges.append(cur_edge)
+            
+            rnd_edge = random.choice(edges)
+            tree_edges.append(rnd_edge)
+            node1, node2 = rnd_edge
+
+            for node in node1, node2:
+                if node not in tree_nodes:
+                    tree_nodes.append(node)
+
+        return tree_edges
+
 
 class DrawPanel(wx.Panel):
     
@@ -92,11 +130,17 @@ class DrawPanel(wx.Panel):
 
         cell_side = side / self.grid_size
 
+        tree_edges = self.graph.spanning_tree_using_prims()
+        tree_edges = set(tree_edges)
+
         for node in self.graph.adj_list.keys():
             x, y = node
             neighbours = self.graph.adj_list[node]
             for neighbour in neighbours:
-                self.draw_edge(node, neighbour, cell_side)
+                if (((node, neighbour) not in tree_edges) and
+                    ((neighbour, node) not in tree_edges)):
+                    self.draw_edge(node, neighbour, cell_side)
+
 
 
 class GraphWindow(wx.Frame):
@@ -107,7 +151,7 @@ class GraphWindow(wx.Frame):
         mainSizer = wx.BoxSizer(wx.VERTICAL)
 
         panelSizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel = DrawPanel(self, -1, grid_size = 4)
+        self.panel = DrawPanel(self, -1, grid_size = 16)
         panelSizer.Add(self.panel , 1, wx.EXPAND)
 
         mainSizer.Add(panelSizer, 8, wx.EXPAND)        
