@@ -8,14 +8,30 @@ class Graph:
     
     def __init__(self, grid_size):
         self.grid_size = grid_size
-        self.graph = dict()
+        self.adj_list = dict()
 
         for x in range(0, grid_size):
             for y in range(0, grid_size):
                 node = (x, y)
-                self.graph[node] = list() 
+                self.adj_list[node] = list() 
+        
+        for node in self.adj_list.keys():
+            x, y = node
+            neighbours = list()
+
+            if x > 0:
+                neighbours.append((x - 1, y))
+
+            if x < grid_size - 1:
+                neighbours.append((x + 1, y))
+
+            if y > 0:
+                neighbours.append((x, y - 1))
+
+            if y < grid_size - 1:
+                neighbours.append((x, y + 1))
             
-    
+            self.adj_list[node] = neighbours
     
 
 class DrawPanel(wx.Panel):
@@ -24,6 +40,19 @@ class DrawPanel(wx.Panel):
         super(DrawPanel, self).__init__(parent, idx)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.grid_size = grid_size
+        self.graph = Graph(self.grid_size)
+
+    def draw_edge(node1, node2, length):
+        x1, y1 = node1
+        x2, y2 = node2
+
+        if x1 == x2 and y1 == y2:
+            return
+        
+        if abs(x1 - x2) > 1 or abs(y1 - y2) > 1:
+            return
+
+             
 
     def OnPaint(self, event=None):
         dc = wx.PaintDC(self)
@@ -42,9 +71,10 @@ class DrawPanel(wx.Panel):
 
         cell_side = side / self.grid_size
 
-        for i in range(0, self.grid_size):
-            dc.DrawLine(rect_startx, rect_starty + i*cell_side, rect_startx + side, rect_starty + i*cell_side)
-            dc.DrawLine(rect_startx + i*cell_side, rect_starty, rect_startx + i*cell_side, rect_starty + side)
+        for node in self.graph.adj_list.keys():
+            neighbours = self.graph.adj_list[node]
+            for nieghbour in neighbours:
+                self.draw_edge(node, neighbour, cell_side)
 
 class GraphWindow(wx.Frame):
 
@@ -54,7 +84,7 @@ class GraphWindow(wx.Frame):
         mainSizer = wx.BoxSizer(wx.VERTICAL)
 
         panelSizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel = DrawPanel(self, -1)
+        self.panel = DrawPanel(self, -1, grid_size = 4)
         panelSizer.Add(self.panel , 1, wx.EXPAND)
 
         mainSizer.Add(panelSizer, 8, wx.EXPAND)        
