@@ -37,15 +37,15 @@ class Graph:
    
     def spanning_tree_using_prims(self):
         tree_edges = list()
-        tree_nodes = list()
+        tree_nodes = set()
         node_cnt = len(self.adj_list.keys())
  
         start_node = random.choice(self.adj_list.keys())
         next_node = random.choice(self.adj_list[start_node])
         
         tree_edges.append((start_node, next_node))
-        tree_nodes.append(start_node)
-        tree_nodes.append(next_node)
+        tree_nodes.add(start_node)
+        tree_nodes.add(next_node)
 
         while (len(tree_edges) < (len(self.adj_list.keys()) - 1)):
 
@@ -67,7 +67,7 @@ class Graph:
 
             for node in node1, node2:
                 if node not in tree_nodes:
-                    tree_nodes.append(node)
+                    tree_nodes.add(node)
 
         return tree_edges
 
@@ -141,8 +141,6 @@ class DrawPanel(wx.Panel):
                     ((neighbour, node) not in tree_edges)):
                     self.draw_edge(node, neighbour, cell_side)
 
-
-
 class GraphWindow(wx.Frame):
 
     def __init__(self, title):
@@ -151,7 +149,7 @@ class GraphWindow(wx.Frame):
         mainSizer = wx.BoxSizer(wx.VERTICAL)
 
         panelSizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel = DrawPanel(self, -1, grid_size = 16)
+        self.panel = DrawPanel(self, -1, grid_size = 32)
         panelSizer.Add(self.panel , 1, wx.EXPAND)
 
         mainSizer.Add(panelSizer, 8, wx.EXPAND)        
