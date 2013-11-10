@@ -50,16 +50,13 @@ class Graph:
         while (len(tree_edges) < (len(self.adj_list.keys()) - 1)):
 
             edges = list()
-            for edge in tree_edges:
-                for node in edge:
-                    neighbours = self.adj_list[node]
-                    for neighbour in neighbours:
-                        
-                        if neighbour in tree_nodes:
-                            continue
-
-                        cur_edge = (node, neighbour) 
-                        edges.append(cur_edge)
+            for node in tree_nodes:
+                neighbours = self.adj_list[node]
+                for neighbour in neighbours:
+                    if neighbour in tree_nodes:
+                        continue
+                    cur_edge = (node, neighbour) 
+                    edges.append(cur_edge)
             
             rnd_edge = random.choice(edges)
             tree_edges.append(rnd_edge)
