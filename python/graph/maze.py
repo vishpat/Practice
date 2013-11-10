@@ -6,6 +6,24 @@ import itertools
 
 length = 600
 
+class DisjointSet:
+    
+    def __init__(self, elements):
+        self._set = {}
+        for element in elements:
+            self._set[element] = element
+
+    def find(self, element):
+        if self._set[element] == element:
+            return element
+        else:
+            self.find(self._set[element])
+
+    def union(self, element1, element2):
+        _set1 = self.find(element1)
+        _set2 = self.find(element2)
+        self._set[_set1] = _set2
+    
 class Graph:
     
     def __init__(self, grid_size):
@@ -34,6 +52,33 @@ class Graph:
                 neighbours.append((x, y + 1))
             
             self.adj_list[node] = neighbours
+ 
+    def spanning_tree_using_kruskal(self):
+        tree_edges = list()
+        graph_edges = list()
+
+        for node in self.adj_list.keys():
+            neighbours = self.adj_list[node]
+            for neighbour in neighbours:
+                if ((node, neighbour) not in graph_edges and
+                    (neighbour, node) not in graph_edges):
+                    graph_edges.append((node, neighbour))        
+        
+        print str(graph_edges)
+        disjoint_set = DisjointSet(self.adj_list.keys())
+        
+        while (len(tree_edges) < (len(self.adj_list.keys()) - 1)):
+            rnd_edge = random.choice(graph_edges)
+            node1, node2 = rnd_edge
+            set1 = disjoint_set.find(node1)
+            set2 = disjoint_set.find(node2)
+            if (set1 != set2):
+                disjoint_set.union(node1, node2)
+                tree_edges.append(rnd_edge)
+
+            graph_edges.remove(rnd_edge)
+
+        return tree_edges
    
     def spanning_tree_using_prims(self):
         tree_edges = list()
@@ -123,7 +168,7 @@ class DrawPanel(wx.Panel):
 
         cell_side = side / self.grid_size
 
-        tree_edges = self.graph.spanning_tree_using_prims()
+        tree_edges = self.graph.spanning_tree_using_kruskal()
         tree_edges = set(tree_edges)
 
         for node in self.graph.adj_list.keys():
@@ -142,7 +187,7 @@ class GraphWindow(wx.Frame):
         mainSizer = wx.BoxSizer(wx.VERTICAL)
 
         panelSizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel = DrawPanel(self, -1, grid_size = 32)
+        self.panel = DrawPanel(self, -1, grid_size = 3)
         panelSizer.Add(self.panel , 1, wx.EXPAND)
 
         mainSizer.Add(panelSizer, 8, wx.EXPAND)        
