@@ -41,11 +41,7 @@ class Graph:
         node_cnt = len(self.adj_list.keys())
  
         start_node = random.choice(self.adj_list.keys())
-        next_node = random.choice(self.adj_list[start_node])
-        
-        tree_edges.append((start_node, next_node))
         tree_nodes.add(start_node)
-        tree_nodes.add(next_node)
 
         while (len(tree_edges) < (len(self.adj_list.keys()) - 1)):
 
