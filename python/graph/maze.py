@@ -195,7 +195,7 @@ class GraphWindow(wx.Frame):
 
 if __name__ == "__main__":
     app = wx.App()
-    frame = GraphWindow("Prim's algorithm")
+    frame = GraphWindow("Maze")
     frame.Show()
     app.MainLoop() 
 
