@@ -17,7 +17,7 @@ class DisjointSet:
         if self._set[element] == element:
             return element
         else:
-            self.find(self._set[element])
+            return self.find(self._set[element])
 
     def union(self, element1, element2):
         _set1 = self.find(element1)
@@ -64,7 +64,6 @@ class Graph:
                     (neighbour, node) not in graph_edges):
                     graph_edges.append((node, neighbour))        
         
-        print str(graph_edges)
         disjoint_set = DisjointSet(self.adj_list.keys())
         
         while (len(tree_edges) < (len(self.adj_list.keys()) - 1)):
@@ -72,6 +71,7 @@ class Graph:
             node1, node2 = rnd_edge
             set1 = disjoint_set.find(node1)
             set2 = disjoint_set.find(node2)
+            
             if (set1 != set2):
                 disjoint_set.union(node1, node2)
                 tree_edges.append(rnd_edge)
@@ -187,7 +187,7 @@ class GraphWindow(wx.Frame):
         mainSizer = wx.BoxSizer(wx.VERTICAL)
 
         panelSizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel = DrawPanel(self, -1, grid_size = 3)
+        self.panel = DrawPanel(self, -1, grid_size = 32)
         panelSizer.Add(self.panel , 1, wx.EXPAND)
 
         mainSizer.Add(panelSizer, 8, wx.EXPAND)        
