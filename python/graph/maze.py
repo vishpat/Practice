@@ -38,7 +38,6 @@ class Graph:
     def spanning_tree_using_prims(self):
         tree_edges = list()
         tree_nodes = set()
-        node_cnt = len(self.adj_list.keys())
  
         start_node = random.choice(self.adj_list.keys())
         tree_nodes.add(start_node)
