@@ -27,12 +27,10 @@ graph2 = {
 
 }
 
-def shortest_path(graph, current, end, path, visited, distance):
-    h = []    
-    path.append(current)
+def shortest_path(graph, current, end, parent, visited, distance):
  
     if current == end:
-        return path
+        return 
  
     neighbours = graph[current]
     for neighbour, neighbour_dist in neighbours:
@@ -42,27 +40,40 @@ def shortest_path(graph, current, end, path, visited, distance):
 
         if distance[current] + neighbour_dist < distance[neighbour]:
             distance[neighbour] = distance[current] + neighbour_dist 
-            heapq.heappush(h, (distance[neighbour], neighbour))
+            parent[neighbour] = current
 
     visited[current] = True
- 
+
+    h = list()
+    for node in graph.keys():
+        if not visited.has_key(node):
+            heapq.heappush(h, (distance[node], node))
+    
     _, min_neighbour = heapq.heappop(h)
-    return shortest_path(graph, min_neighbour, end, path, visited, distance)      
+    shortest_path(graph, min_neighbour, end, parent, visited, distance)      
 
 
 def find_shortest(graph, start, end):
     visited = defaultdict(bool) 
     distance = {}
-    path = []
+    parent = {} 
 
     for node in graph.keys():
         distance[node] = sys.maxint
 
     distance[start] = 0
+    parent[start] = None
 
-    return shortest_path(graph, start, end, path, visited, distance)
+    shortest_path(graph, start, end, parent, visited, distance)
+    
+    path = []
+    cur = end
+    while cur != start:
+        path.append(cur)
+        cur = parent[cur]
+    path.append(cur)
+    path.reverse()
+    return path
 
 if __name__ == "__main__":
     print str(find_shortest(graph2, 'A', 'H'))
-
-
