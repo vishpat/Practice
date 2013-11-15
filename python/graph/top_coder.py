@@ -8,6 +8,35 @@ from shortest_path import shortest_distance
 # SRM 150 RoboCourier
 class RoboCourier:
 
+    def get_instructions(self, path):
+        instructions = ""
+
+        mapping = {
+            (0, 1)  : 'F',
+            (1, 0)  : 'RF',
+            (1, -1) : 'RRF',
+            (0, -1) : 'RRRF',
+            (-1, 0) : 'LLF',
+            (-1, 1) : 'LF'
+
+        }
+
+        edges = len(path) - 1
+
+        for i in range(0, edges):
+            n1 = path[i]
+            n2 = path[i + 1]
+
+            diff_x = n2[0] - n1[0]
+            diff_y = n2[1] - n1[1]
+            
+            move = mapping[(diff_x, diff_y)]
+            
+            instructions += move
+        
+        return instructions
+
+
     def create_graph(self, path_str):
         
         graph = defaultdict(list) 
@@ -69,11 +98,13 @@ class RoboCourier:
         start, end, graph = self.create_graph(path_str)           
 
         path = shortest_path(graph, start, end)
-        shortest_dist = shortest_distance(graph, start, end)
-  
-        print str(path)
-        return shortest_dist
+        instructions = self.get_instructions(path)
+        return path, instructions
 
 if __name__ == "__main__":
+    import sys
+
     rb = RoboCourier()
-    print str(rb.timeToDeliver("FFFFFFFFFRRFFFFFFRRFFFFFFLLFFFFFFLLFFFFFFRRFFFF"))
+    path, instructions = rb.timeToDeliver(sys.argv[1])
+    print str(path)
+    print str(instructions)
