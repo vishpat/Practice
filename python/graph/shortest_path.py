@@ -27,7 +27,7 @@ graph2 = {
 
 }
 
-def shortest_path(graph, current, end, parent, visited, distance):
+def find_shortest_path(graph, current, end, parent, visited, distance):
  
     if current == end:
         return 
@@ -50,7 +50,7 @@ def shortest_path(graph, current, end, parent, visited, distance):
             heapq.heappush(h, (distance[node], node))
     
     _, min_neighbour = heapq.heappop(h)
-    shortest_path(graph, min_neighbour, end, parent, visited, distance)      
+    find_shortest_path(graph, min_neighbour, end, parent, visited, distance)      
 
 
 def find_shortest(graph, start, end):
@@ -64,7 +64,7 @@ def find_shortest(graph, start, end):
     distance[start] = 0
     parent[start] = None
 
-    shortest_path(graph, start, end, parent, visited, distance)
+    find_shortest_path(graph, start, end, parent, visited, distance)
     
     path = []
     cur = end
@@ -73,7 +73,16 @@ def find_shortest(graph, start, end):
         cur = parent[cur]
     path.append(cur)
     path.reverse()
+    return path, distance
+
+def shortest_distance(graph, start, end):
+    path, distance = find_shortest(graph, start, end)
+    return distance[end]    
+
+def shortest_path(graph, start, end):
+    path, _ = find_shortest(graph, start, end)
     return path
 
 if __name__ == "__main__":
-    print str(find_shortest(graph2, 'A', 'H'))
+    print str(shortest_path(graph1, 'O', 'T'))
+    print str(shortest_path(graph2, 'A', 'H'))
