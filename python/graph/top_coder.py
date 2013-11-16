@@ -34,13 +34,8 @@ class RoboCourier:
             cur_x, cur_y = cur_state
 
             if instruction == 'F':
+                distance += 4
                 
-                if (i > 0 and i < (instruction_cnt - 1) and 
-                    path[i - 1] == 'F' and path[i+ 1] == 'F'):
-                    distance += 2
-                else:    
-                    distance += 4
-
                 x, y = mapping[cur_angle]
                 next_state = (cur_x + x, cur_y + y)
 
@@ -57,7 +52,7 @@ class RoboCourier:
                 cur_angle %= 360
                 distance += 3
             elif instruction == 'L':
-                cur_angle -= 60
+                cur_angle += 300
                 cur_angle %= 360
                 distance += 3
        
@@ -186,4 +181,5 @@ if __name__ == "__main__":
     for moves, cost in tests:
         rb = RoboCourier()
         path, instructions, min_cost = rb.timeToDeliver(moves)
+        print str(instructions)
         assert cost == min_cost, "Expected %d got %d" % (cost, min_cost)
