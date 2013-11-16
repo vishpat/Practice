@@ -26,7 +26,7 @@ class RoboCourier:
         start_state = cur_state = (0, 0)
         cur_angle = 0
         distance = 0
-        
+        inst_angle = 0        
         instruction_cnt = len(path)
 
         for i in range(0, instruction_cnt):
@@ -34,8 +34,18 @@ class RoboCourier:
             cur_x, cur_y = cur_state
 
             if instruction == 'F':
-                distance += 4
+                if (i > 0 and i < (instruction_cnt - 1) and 
+                    path[i - 1] == 'F' and path[i + 1] == 'F'):
+                    distance += 2
+                else:    
+                    distance += 4
                 
+                inst_angle %= 180
+                if inst_angle == 60:
+                    distance += 3
+                elif inst_angle == 120:
+                    distance += 6
+
                 x, y = mapping[cur_angle]
                 next_state = (cur_x + x, cur_y + y)
 
@@ -47,14 +57,15 @@ class RoboCourier:
                 
                 cur_state = next_state
                 distance = 0
+                inst_angle = 0
             elif instruction == 'R':
                 cur_angle += 60
                 cur_angle %= 360
-                distance += 3
+                inst_angle += 60
             elif instruction == 'L':
                 cur_angle += 300
                 cur_angle %= 360
-                distance += 3
+                inst_angle += 300
        
         end_state = cur_state
 
