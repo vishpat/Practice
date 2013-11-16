@@ -8,35 +8,6 @@ from shortest_path import shortest_distance
 # SRM 150 RoboCourier
 class RoboCourier:
 
-    def get_instructions(self, path):
-        instructions = ""
-
-        mapping = {
-            (0, 1)  : 'F',
-            (1, 0)  : 'RF',
-            (1, -1) : 'RRF',
-            (0, -1) : 'RRRF',
-            (-1, 0) : 'LLF',
-            (-1, 1) : 'LF'
-
-        }
-
-        edges = len(path) - 1
-
-        for i in range(0, edges):
-            n1 = path[i]
-            n2 = path[i + 1]
-
-            diff_x = n2[0] - n1[0]
-            diff_y = n2[1] - n1[1]
-            
-            move = mapping[(diff_x, diff_y)]
-            
-            instructions += move
-        
-        return instructions
-
-
     def create_graph(self, path_str):
         
         graph = defaultdict(list) 
@@ -94,11 +65,50 @@ class RoboCourier:
 
         return start_state, end_state, graph
 
+    def get_minimum_distance(self, path):
+        
+        axis_x = 1
+        axis_y = 2
+        axis_z = 3
+        
+        instructions = str() 
+
+        axis_mapping = {
+            (0, 1) : axis_y, 
+            (1, 0) : axis_x,
+           (1, -1) : axis_z,
+           (0, -1) : axis_y,
+           (-1, 0) : axis_x,
+           (-1, 1) : axis_z
+        }
+
+        edge_cnt = len(path) - 1
+        priv_axis = axis_y 
+
+        for node_idx in xrange(0, edge_cnt):
+            n1 = path[node_idx]
+            n2 = path[node_idx + 1]
+
+            dx = n2[0] - n1[0]
+            dy = n2[1] - n1[1]
+            
+            cur_axis  = axis_mapping[(dx, dy)]  
+            
+            if cur_axis == priv_axis:
+                instructions += 'F'             
+            else:
+                instructions += 'TF'
+
+            priv_axis = cur_axis 
+
+        return instructions
+
     def timeToDeliver(self, path_str):
         start, end, graph = self.create_graph(path_str)           
 
         path = shortest_path(graph, start, end)
-        instructions = self.get_instructions(path)
+        instructions = self.get_minimum_distance(path)
+
         return path, instructions
 
 if __name__ == "__main__":
@@ -106,5 +116,4 @@ if __name__ == "__main__":
 
     rb = RoboCourier()
     path, instructions = rb.timeToDeliver(sys.argv[1])
-    print str(path)
-    print str(instructions)
+    print str(path), "\n", str(instructions)
