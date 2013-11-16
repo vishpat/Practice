@@ -71,20 +71,6 @@ class RoboCourier:
 
         return start_state, end_state, graph
 
-    def opposite_inst(self, inst):
-        
-        if inst == 'L':
-            return 'R'
-        
-        if inst == 'R':
-            return 'L'
-
-        if inst == 'LL':
-            return 'RR'
-
-        if inst == 'RR':
-            return 'LL'    
-
     def get_min_moves(self, path):
         
         pos_x_dir = 1
@@ -138,10 +124,8 @@ class RoboCourier:
                     instructions += 'LLL'
                 elif inst_mapping.has_key((priv_dir, cur_dir)):
                     instructions += inst_mapping[(priv_dir, cur_dir)]
-                elif inst_mapping.has_key((-1*priv_dir, -1*cur_dir)):
+                else:
                     instructions += inst_mapping[(-1*priv_dir, -1*cur_dir)]
-                else:    
-                    instructions += self.opposite_inst(inst_mapping[(cur_dir, priv_dir)])
                 
             instructions += 'F'             
  
@@ -185,12 +169,12 @@ tests = [
     ('FFFFFFFFFRRFFFFFFRRFFFFFFLLFFFFFFLLFFFFFFRRFFFF', 44),
     ('RFLLFLFLFRFRRFFFRFFRFFRRFLFFRLRRFFLFFLFLLFRFLFLRFFRFFLFLFFRFFLLFLLFRFRFLRLFLRRFLRFLFFLFFFLFLFFRLFRLFLLFLFLRLRRFLFLFRLFRF', 24),
 
-    ('LLFLFRLRRLRFFLRRRRFFFLRFFRRRLLFLFLLRLRFFLFRRFFFLFLRLFFRRLRLRRFFFLLLRFRLLRFFLFRLFRRFRRRFRLRLRLFFLLFLFFRFLRFRRLLLRFFRRRLRFLFRRFLFFRLFLFLFRLLLLFRLLRFLLLFFFLFRFRRFLLFFLLLFFRLLFLRRFRLFFFRRFFFLLRFFLRFRRRLLRFFFRRLLFLLRLFRRLRLLFFFLFLRFFRLRLLFLRLFFLLFFLLFFFRRLRFRRFLRRLRRLRFFFLLLLRRLRFFLFRFFRLLRFLFRRFLFLFFLFRRFRRLRRFLFFFLLRFLFRRFRFLRLRLLLLFLFFFLFRLLRFRLFRLFRLLFLFRLFFFFFFFRRLRLRLLRFLRLRRRRRRRRLFLFLFLRFLFRLFFRLFRRLLRRRRFFFRRRLLLLRRLFFLLLLLRFFFFRFRRLRRRFFFLLFFFFFLRRLRFLLRRLRLRFRRRRLFLLRFLRRFFFRFRLFFRLLFFRRLL', 169)
+    ('LLFLFRLRRLRFFLRRRRFFFLRFFRRRLLFLFLLRLRFFLFRRFFFLFLRLFFRRLRLRRFFFLLLRFRLLRFFLFRLFRRFRRRFRLRLRLFFLLFLFFRFLRFRRLLLRFFRRRLRFLFRRFLFFRLFLFLFRLLLLFRLLRFLLLFFFLFRFRRFLLFFLLLFFRLLFLRRFRLFFFRRFFFLLRFFLRFRRRLLRFFFRRLLFLLRLFRRLRLLFFFLFLRFFRLRLLFLRLFFLLFFLLFFFRRLRFRRFLRRLRRLRFFFLLLLRRLRFFLFRFFRLLRFLFRRFLFLFFLFRRFRRLRRFLFFFLLRFLFRRFRFLRLRLLLLFLFFFLFRLLRFRLFRLFRLLFLFRLFFFFFFFRRLRLRLLRFLRLRRRRRRRRLFLFLFLRFLFRLFFRLFRRLLRRRRFFFRRRLLLLRRLFFLLLLLRFFFFRFRRLRRRFFFLLFFFFFLRRLRFLLRRLRLRFRRRRLFLLRFLRRFFFRFRLFFRLLFFRRLL',
+    169)
 ]
 
 if __name__ == "__main__":
     for moves, cost in tests:
         rb = RoboCourier()
         path, instructions, min_cost = rb.timeToDeliver(moves)
-        print str(instructions)
         assert cost == min_cost, "Expected %d got %d" % (cost, min_cost)
