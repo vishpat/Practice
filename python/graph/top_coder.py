@@ -34,12 +34,7 @@ class RoboCourier:
             cur_x, cur_y = cur_state
 
             if instruction == 'F':
-                if (i > 0 and i < (instruction_cnt - 1) and 
-                    path[i - 1] == 'F' and path[i + 1] == 'F'):
-                    distance += 2
-                else:    
-                    distance += 4
-                
+                distance = 4               
                 inst_angle %= 180
                 if inst_angle == 60:
                     distance += 3
@@ -157,24 +152,27 @@ class RoboCourier:
         start, end, graph = self.create_graph(path_str)           
 
         path = shortest_path(graph, start, end)
+        dist = shortest_distance(graph, start, end)
         instructions = self.get_min_moves(path)
         cost = self.get_cost(instructions)
 
-        return path, instructions, cost
+        return path, dist, instructions, cost
 
-tests = [ 
-    ('FRRFLLFLLFRRFLF', 15),
-    ('RFLLF', 17),
-    ('FLFRRFRFRRFLLFRRF', 0),
-    ('FFFFFFFFFRRFFFFFFRRFFFFFFLLFFFFFFLLFFFFFFRRFFFF', 44),
-    ('RFLLFLFLFRFRRFFFRFFRFFRRFLFFRLRRFFLFFLFLLFRFLFLRFFRFFLFLFFRFFLLFLLFRFRFLRLFLRRFLRFLFFLFFFLFLFFRLFRLFLLFLFLRLRRFLFLFRLFRF', 24),
+    def run_tests(self):
+        tests = [ 
+            ('FRRFLLFLLFRRFLF', 15),
+            ('RFLLF', 17),
+            ('FLFRRFRFRRFLLFRRF', 0),
+            ('FFFFFFFFFRRFFFFFFRRFFFFFFLLFFFFFFLLFFFFFFRRFFFF', 44),
+            ('RFLLFLFLFRFRRFFFRFFRFFRRFLFFRLRRFFLFFLFLLFRFLFLRFFRFFLFLFFRFFLLFLLFRFRFLRLFLRRFLRFLFFLFFFLFLFFRLFRLFLLFLFLRLRRFLFLFRLFRF', 24),
 
-    ('LLFLFRLRRLRFFLRRRRFFFLRFFRRRLLFLFLLRLRFFLFRRFFFLFLRLFFRRLRLRRFFFLLLRFRLLRFFLFRLFRRFRRRFRLRLRLFFLLFLFFRFLRFRRLLLRFFRRRLRFLFRRFLFFRLFLFLFRLLLLFRLLRFLLLFFFLFRFRRFLLFFLLLFFRLLFLRRFRLFFFRRFFFLLRFFLRFRRRLLRFFFRRLLFLLRLFRRLRLLFFFLFLRFFRLRLLFLRLFFLLFFLLFFFRRLRFRRFLRRLRRLRFFFLLLLRRLRFFLFRFFRLLRFLFRRFLFLFFLFRRFRRLRRFLFFFLLRFLFRRFRFLRLRLLLLFLFFFLFRLLRFRLFRLFRLLFLFRLFFFFFFFRRLRLRLLRFLRLRRRRRRRRLFLFLFLRFLFRLFFRLFRRLLRRRRFFFRRRLLLLRRLFFLLLLLRFFFFRFRRLRRRFFFLLFFFFFLRRLRFLLRRLRLRFRRRRLFLLRFLRRFFFRFRLFFRLLFFRRLL',
-    169)
-]
+        #    ('LLFLFRLRRLRFFLRRRRFFFLRFFRRRLLFLFLLRLRFFLFRRFFFLFLRLFFRRLRLRRFFFLLLRFRLLRFFLFRLFRRFRRRFRLRLRLFFLLFLFFRFLRFRRLLLRFFRRRLRFLFRRFLFFRLFLFLFRLLLLFRLLRFLLLFFFLFRFRRFLLFFLLLFFRLLFLRRFRLFFFRRFFFLLRFFLRFRRRLLRFFFRRLLFLLRLFRRLRLLFFFLFLRFFRLRLLFLRLFFLLFFLLFFFRRLRFRRFLRRLRRLRFFFLLLLRRLRFFLFRFFRLLRFLFRRFLFLFFLFRRFRRLRRFLFFFLLRFLFRRFRFLRLRLLLLFLFFFLFRLLRFRLFRLFRLLFLFRLFFFFFFFRRLRLRLLRFLRLRRRRRRRRLFLFLFLRFLFRLFFRLFRRLLRRRRFFFRRRLLLLRRLFFLLLLLRFFFFRFRRLRRRFFFLLFFFFFLRRLRFLLRRLRLRFRRRRLFLLRFLRRFFFRFRLFFRLLFFRRLL', 169)
+            ]
+
+        for moves, cost in tests:
+            path, dist, instructions, min_cost = self.timeToDeliver(moves)
+            assert cost == min_cost, "Expected %d got %d" % (cost, min_cost) 
 
 if __name__ == "__main__":
-    for moves, cost in tests:
-        rb = RoboCourier()
-        path, instructions, min_cost = rb.timeToDeliver(moves)
-        assert cost == min_cost, "Expected %d got %d" % (cost, min_cost)
+    rb = RoboCourier()
+    rb.run_tests()
