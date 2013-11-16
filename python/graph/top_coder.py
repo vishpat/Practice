@@ -65,25 +65,59 @@ class RoboCourier:
 
         return start_state, end_state, graph
 
+    def get_opposite(self, inst):
+        
+        if inst == 'L':
+            return 'R':
+        
+        if inst == 'R':
+            return 'L'
+
+        if inst == 'LL':
+            return 'RR'
+
+        if inst == 'RR':
+            return 'LL'    
+
     def get_minimum_distance(self, path):
         
-        axis_x = 1
-        axis_y = 2
-        axis_z = 3
+        pos_x_dir = 1
+        pos_y_dir = 2
+        pos_z_dir = 3
         
-        instructions = str() 
+        neg_x_dir = -pos_x_dir
+        neg_y_dir = -pos_y_dir
+        neg_z_dir = -pos_z_dir
 
-        axis_mapping = {
-            (0, 1) : axis_y, 
-            (1, 0) : axis_x,
-           (1, -1) : axis_z,
-           (0, -1) : axis_y,
-           (-1, 0) : axis_x,
-           (-1, 1) : axis_z
+        inst_mapping = {
+            (pos_x_dir, pos_y_dir) : 'L', 
+            (pos_x_dir, pos_z_dir) : 'R', 
+            (pos_x_dir, neg_y_dir) : 'RR', 
+            (pos_x_dir, neg_z_dir) : 'LL', 
+            (pos_y_dir, pos_x_dir) : 'R', 
+            (pos_y_dir, pos_z_dir) : 'RR', 
+            (pos_y_dir, neg_x_dir) : 'LL', 
+            (pos_y_dir, neg_z_dir) : 'L', 
+            (pos_z_dir, pos_x_dir) : 'L', 
+            (pos_z_dir, pos_y_dir) : 'LL', 
+            (pos_z_dir, neg_x_dir) : 'RR', 
+            (pos_z_dir, neg_y_dir) : 'R', 
         }
 
-        edge_cnt = len(path) - 1
-        priv_axis = axis_y 
+        
+        dir_mapping = {
+            (0, 1) : pos_y_dir, 
+            (1, 0) : pos_x_dir,
+           (1, -1) : pos_z_dir,
+           (0, -1) : neg_y_dir,
+           (-1, 0) : neg_x_dir,
+           (-1, 1) : neg_z_dir
+        }
+
+        instructions = str() 
+
+       edge_cnt = len(path) - 1
+        priv_dir = y_dir 
 
         for node_idx in xrange(0, edge_cnt):
             n1 = path[node_idx]
@@ -92,14 +126,14 @@ class RoboCourier:
             dx = n2[0] - n1[0]
             dy = n2[1] - n1[1]
             
-            cur_axis  = axis_mapping[(dx, dy)]  
+            cur_dir  = dir_mapping[(dx, dy)]  
             
-            if cur_axis == priv_axis:
+            if cur_dir == priv_dir:
                 instructions += 'F'             
             else:
                 instructions += 'TF'
 
-            priv_axis = cur_axis 
+            priv_dir = cur_dir 
 
         return instructions
 
