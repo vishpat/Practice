@@ -79,7 +79,7 @@ class RoboCourier:
         if inst == 'RR':
             return 'LL'    
 
-    def get_minimum_distance(self, path):
+    def get_min_moves(self, path):
         
         pos_x_dir = 1
         pos_y_dir = 2
@@ -128,8 +128,12 @@ class RoboCourier:
             cur_dir  = dir_mapping[(dx, dy)]  
             
             if cur_dir != priv_dir:
-                if inst_mapping.has_key((priv_dir, cur_dir)):
+                if cur_dir == -1*priv_dir:
+                    instructions += 'LLL'
+                elif inst_mapping.has_key((priv_dir, cur_dir)):
                     instructions += inst_mapping[(priv_dir, cur_dir)]
+                elif inst_mapping.has_key((-1*priv_dir, -1*cur_dir)):
+                    instructions += inst_mapping[(-1*priv_dir, -1*cur_dir)]
                 else:    
                     instructions += self.opposite_inst(inst_mapping[(cur_dir, priv_dir)])
                 
@@ -139,17 +143,47 @@ class RoboCourier:
 
         return instructions
 
+    def get_cost(self, instructions):
+        cost = 0
+        instruction_cnt = len(instructions)
+
+        for i in range(0, instruction_cnt):
+            instruction = instructions[i]
+
+            if instruction == 'F':
+                
+                if (i > 0 and i < (instruction_cnt - 1) and 
+                    instructions[i - 1] == 'F' and instructions[i + 1] == 'F'):
+                    cost += 2
+                else:    
+                    cost += 4
+            elif instruction == 'R' or instruction == 'L':
+                cost += 3
+    
+        return cost
+
+
     def timeToDeliver(self, path_str):
         start, end, graph = self.create_graph(path_str)           
 
         path = shortest_path(graph, start, end)
-        instructions = self.get_minimum_distance(path)
+        instructions = self.get_min_moves(path)
+        cost = self.get_cost(instructions)
 
-        return path, instructions
+        return path, instructions, cost
+
+tests = [ 
+    ('FRRFLLFLLFRRFLF', 15),
+    ('RFLLF', 17),
+    ('FLFRRFRFRRFLLFRRF', 0),
+    ('FFFFFFFFFRRFFFFFFRRFFFFFFLLFFFFFFLLFFFFFFRRFFFF', 44),
+    ('RFLLFLFLFRFRRFFFRFFRFFRRFLFFRLRRFFLFFLFLLFRFLFLRFFRFFLFLFFRFFLLFLLFRFRFLRLFLRRFLRFLFFLFFFLFLFFRLFRLFLLFLFLRLRRFLFLFRLFRF', 24),
+
+    ('LLFLFRLRRLRFFLRRRRFFFLRFFRRRLLFLFLLRLRFFLFRRFFFLFLRLFFRRLRLRRFFFLLLRFRLLRFFLFRLFRRFRRRFRLRLRLFFLLFLFFRFLRFRRLLLRFFRRRLRFLFRRFLFFRLFLFLFRLLLLFRLLRFLLLFFFLFRFRRFLLFFLLLFFRLLFLRRFRLFFFRRFFFLLRFFLRFRRRLLRFFFRRLLFLLRLFRRLRLLFFFLFLRFFRLRLLFLRLFFLLFFLLFFFRRLRFRRFLRRLRRLRFFFLLLLRRLRFFLFRFFRLLRFLFRRFLFLFFLFRRFRRLRRFLFFFLLRFLFRRFRFLRLRLLLLFLFFFLFRLLRFRLFRLFRLLFLFRLFFFFFFFRRLRLRLLRFLRLRRRRRRRRLFLFLFLRFLFRLFFRLFRRLLRRRRFFFRRRLLLLRRLFFLLLLLRFFFFRFRRLRRRFFFLLFFFFFLRRLRFLLRRLRLRFRRRRLFLLRFLRRFFFRFRLFFRLLFFRRLL', 169)
+]
 
 if __name__ == "__main__":
-    import sys
-
-    rb = RoboCourier()
-    path, instructions = rb.timeToDeliver(sys.argv[1])
-    print str(path), "\n", str(instructions)
+    for moves, cost in tests:
+        rb = RoboCourier()
+        path, instructions, min_cost = rb.timeToDeliver(moves)
+        assert cost == min_cost, "Expected %d got %d" % (cost, min_cost)
