@@ -65,10 +65,10 @@ class RoboCourier:
 
         return start_state, end_state, graph
 
-    def get_opposite(self, inst):
+    def opposite_inst(self, inst):
         
         if inst == 'L':
-            return 'R':
+            return 'R'
         
         if inst == 'R':
             return 'L'
@@ -103,7 +103,6 @@ class RoboCourier:
             (pos_z_dir, neg_x_dir) : 'RR', 
             (pos_z_dir, neg_y_dir) : 'R', 
         }
-
         
         dir_mapping = {
             (0, 1) : pos_y_dir, 
@@ -116,8 +115,8 @@ class RoboCourier:
 
         instructions = str() 
 
-       edge_cnt = len(path) - 1
-        priv_dir = y_dir 
+        edge_cnt = len(path) - 1
+        priv_dir = pos_y_dir 
 
         for node_idx in xrange(0, edge_cnt):
             n1 = path[node_idx]
@@ -128,11 +127,14 @@ class RoboCourier:
             
             cur_dir  = dir_mapping[(dx, dy)]  
             
-            if cur_dir == priv_dir:
-                instructions += 'F'             
-            else:
-                instructions += 'TF'
-
+            if cur_dir != priv_dir:
+                if inst_mapping.has_key((priv_dir, cur_dir)):
+                    instructions += inst_mapping[(priv_dir, cur_dir)]
+                else:    
+                    instructions += self.opposite_inst(inst_mapping[(cur_dir, priv_dir)])
+                
+            instructions += 'F'             
+ 
             priv_dir = cur_dir 
 
         return instructions
