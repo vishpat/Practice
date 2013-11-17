@@ -28,30 +28,27 @@ graph2 = {
 }
 
 def find_shortest_path(graph, current, end, parent, visited, distance):
+
+    while current and current != end:
  
-    if current == None or current == end:
-        return 
- 
-    neighbours = graph[current]
-    for neighbour, neighbour_dist in neighbours:
+        neighbours = graph[current]
+        for neighbour, neighbour_dist in neighbours:
         
-        if visited.has_key(neighbour):
-            continue
+            if visited.has_key(neighbour):
+                continue
 
-        if distance[current] + neighbour_dist < distance[neighbour]:
-            distance[neighbour] = distance[current] + neighbour_dist 
-            parent[neighbour] = current
+            if distance[current] + neighbour_dist < distance[neighbour]:
+                distance[neighbour] = distance[current] + neighbour_dist 
+                parent[neighbour] = current
 
-    visited[current] = True
+        visited[current] = True
 
-    h = list()
-    for node in graph.keys():
-        if not visited.has_key(node):
-            heapq.heappush(h, (distance[node], node))
+        h = list()
+        for node in graph.keys():
+            if not visited.has_key(node):
+                heapq.heappush(h, (distance[node], node))
     
-    _, min_neighbour = heapq.heappop(h) if len(h) > 0 else None
-    find_shortest_path(graph, min_neighbour, end, parent, visited, distance)      
-
+        _, current = heapq.heappop(h) if len(h) > 0 else None
 
 def find_shortest(graph, start, end):
     visited = defaultdict(bool) 
