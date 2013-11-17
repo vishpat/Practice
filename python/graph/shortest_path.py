@@ -28,6 +28,9 @@ graph2 = {
 }
 
 def find_shortest_path(graph, current, end, parent, visited, distance):
+    
+    candidates = set()
+    candidates.add(current)
 
     while current and current != end:
  
@@ -40,13 +43,14 @@ def find_shortest_path(graph, current, end, parent, visited, distance):
             if distance[current] + neighbour_dist < distance[neighbour]:
                 distance[neighbour] = distance[current] + neighbour_dist 
                 parent[neighbour] = current
+                candidates.add(neighbour)
 
         visited[current] = True
+        candidates.remove(current)
 
         h = list()
-        for node in graph.keys():
-            if not visited.has_key(node):
-                heapq.heappush(h, (distance[node], node))
+        for node in candidates:
+            heapq.heappush(h, (distance[node], node))
   
         current = None
         if len(h) > 0:    

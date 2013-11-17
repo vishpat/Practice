@@ -8,7 +8,7 @@ from shortest_path import shortest_distance
 safe = 0
 harmful = 1
 deadly = sys.maxint 
-size = 50 + 1 
+size = 500 + 1 
 
 class Escape:
     def lowest(self, harmful_areas, deadly_areas):
@@ -38,6 +38,10 @@ class Escape:
             for j in range(0, size):
 
                 state = matrix[i][j]
+                
+                if (state == deadly and not (i == 0 and j == 0)):
+                    continue
+
                 node = (i, j)
                 neighbours = list()
 
@@ -54,7 +58,10 @@ class Escape:
                     neighbours.append(((i, j + 1), matrix[i][j + 1]))
 
                 graph[node] = neighbours
-        
+
+        matrix = None 
+        print "Graph done"
+
         min_path = shortest_path(graph, (0, 0), (size - 1, size - 1))
         min_dist = shortest_distance(graph, (0, 0), (size - 1, size - 1))
 
@@ -63,4 +70,4 @@ class Escape:
 
 if __name__ == "__main__":
     esc = Escape()
-    esc.lowest(["50 0 0 50"], ["0 0 0 0"])
+    esc.lowest(["500 0 0 500"], ["0 0 0 0"])
