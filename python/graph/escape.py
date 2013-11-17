@@ -10,6 +10,8 @@ harmful = 1
 deadly = sys.maxint 
 size = 500 + 1 
 
+# TCI '02 Semifinals 2 (Division I Level Two)
+
 class Escape:
 
     def lowest(self, harmful_areas, deadly_areas):
