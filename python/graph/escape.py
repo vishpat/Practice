@@ -11,6 +11,7 @@ deadly = sys.maxint
 size = 500 + 1 
 
 class Escape:
+
     def lowest(self, harmful_areas, deadly_areas):
         
         matrix = list()
@@ -60,14 +61,25 @@ class Escape:
                 graph[node] = neighbours
 
         matrix = None 
-        print "Graph done"
 
         min_path = shortest_path(graph, (0, 0), (size - 1, size - 1))
         min_dist = shortest_distance(graph, (0, 0), (size - 1, size - 1))
 
-        print str(min_dist)
+        return min_dist
 
+    def run_tests(self):
+        tests = [ 
+            ([], [], 0),
+            (["500 0 0 500"], ["0 0 0 0"], 1000),
+            (["0 0 250 250", "250 250 500 500"], ["0 251 249 500","251 0 500 249"], 1000),
+            (["0 0 250 250", "250 250 500 500"], ["0 250 250 500", "250 0 500 250"], -1)
+        ]
+
+        for harmful, deadly, cost in tests:
+            print "Testing ", str(harmful), str(deadly)
+            min_cos = self.lowest(harmful, deadly)
+            assert min_cos == cost, "Did not find the expected lowest cost min_cost %d  expected %d" % (min_cos, cost)
 
 if __name__ == "__main__":
     esc = Escape()
-    esc.lowest(["500 0 0 500"], ["0 0 0 0"])
+    esc.run_tests()
