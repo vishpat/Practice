@@ -27,11 +27,12 @@ graph2 = {
 
 }
 
-def find_shortest_path(graph, current, end, parent, visited, distance):
-    
-    candidates = set()
-    candidates.add(current)
+def find_shortest_path(graph, start, end, parent, visited, distance):
+    import bisect
 
+    current = start
+    candidates = list()
+    
     while current and current != end:
  
         neighbours = graph[current]
@@ -41,20 +42,19 @@ def find_shortest_path(graph, current, end, parent, visited, distance):
                 continue
 
             if distance[current] + neighbour_dist < distance[neighbour]:
+                
+                if ((distance[neighbour], neighbour) in candidates):
+                    candidates.remove((distance[neighbour], neighbour))
+
                 distance[neighbour] = distance[current] + neighbour_dist 
+                bisect.insort(candidates, (distance[neighbour], neighbour))
                 parent[neighbour] = current
-                candidates.add(neighbour)
 
         visited[current] = True
-        candidates.remove(current)
-
-        h = list()
-        for node in candidates:
-            heapq.heappush(h, (distance[node], node))
-  
         current = None
-        if len(h) > 0:    
-            _, current = heapq.heappop(h) 
+
+        if len(candidates) > 0:
+            _, current = candidates.pop(0)
 
 def find_shortest(graph, start, end):
     visited = defaultdict(bool) 
