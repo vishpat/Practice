@@ -47,8 +47,10 @@ def find_shortest_path(graph, current, end, parent, visited, distance):
         for node in graph.keys():
             if not visited.has_key(node):
                 heapq.heappush(h, (distance[node], node))
-    
-        _, current = heapq.heappop(h) if len(h) > 0 else None
+  
+        current = None
+        if len(h) > 0:    
+            _, current = heapq.heappop(h) 
 
 def find_shortest(graph, start, end):
     visited = defaultdict(bool) 
