@@ -35,16 +35,21 @@ class rect(svgshape):
         else:
             self.x = self.y = self.rx = self.ry = self.width = self.height = 0
             logging.error("Unable to get the attributes for %s", self.xml)
- 
-
-    def __str__(self):
-        return "<rect x=%d y=%d width=%d height=%d/>" % (self.x, self.y, self.width, self.height)
 
 class circle(svgshape):
     pass    
 
 class ellipse(svgshape):
     pass        
+
+class line(svgshape):
+    pass        
+
+class polygon(svgshape):
+    pass
+
+class polyline(svgshape):
+    pass
 
 if __name__ == "__main__":
     r = rect("""<rect x="1" y="1" width="1198" height="398"/>""")
