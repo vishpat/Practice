@@ -17,6 +17,9 @@ class svgpath(object):
     def path(self):
         raise NotImplementedError
 
+    def path_tag(self, p):
+        return "<path d=\"" + p + "\"/>"
+
     def gcode(self):
         raise NotImplementedError
 
@@ -38,7 +41,7 @@ class rect(svgpath):
             self.height = int(rect_el.get('height')) if rect_el.get('height') else 0
         else:
             self.x = self.y = self.rx = self.ry = self.width = self.height = 0
-            logging.error("Unable to get the attributes for %s", self.xml)
+            logging.error("rect: Unable to get the attributes for %s", self.xml)
 
     def path(self):
         a = list()
@@ -47,7 +50,7 @@ class rect(svgpath):
         a.append( [' l ', [0, self.height]] )
         a.append( [' l ', [-self.width, 0]] )
         a.append( [' Z', []] )
-        return "<path d=\"" + simplepath.formatPath(a) + "\"/>"
+        return self.path_tag(simplepath.formatPath(a))
 
 class ellipse(svgpath):
 
@@ -62,7 +65,7 @@ class ellipse(svgpath):
             self.ry = int(ellipse_el.get('ry')) if ellipse_el.get('ry') else 0
         else:
             self.cx = self.cy = self.rx = self.ry = 0
-            logging.error("Unable to get the attributes for %s", self.xml)
+            logging.error("ellipse: Unable to get the attributes for %s", self.xml)
 
     def path(self):
         x1 = self.cx - self.rx
@@ -72,11 +75,11 @@ class ellipse(svgpath):
             '0 1 0 %f,%f ' % ( x2, self.cy ) + \
             'A %f,%f ' % ( self.rx, self.ry ) + \
             '0 1 0 %f,%f' % ( x1, self.cy )
-        return p 
+        return self.path_tag(p)
 
 class circle(ellipse):
     def __init__(self, xml):
-        super(circle, self).__init__(xml)
+        super(ellipse, self).__init__(xml)
 
         if (not (self.xml_tree == None) and self.xml_tree.tag == 'circle'):
             circle_el = self.xml_tree
@@ -86,7 +89,7 @@ class circle(ellipse):
             self.ry = self.rx
         else:
             self.cx = self.cy = self.r = 0
-            logging.error("Unable to get the attributes for %s", self.xml)
+            logging.error("Circle: Unable to get the attributes for %s", self.xml)
 
 class line(svgpath):
 
@@ -101,13 +104,13 @@ class line(svgpath):
             self.y2 = int(line_el.get('y2')) if line_el.get('y2') else 0
         else:
             self.x1 = self.y1 = self.x2 = self.y2 = 0
-            logging.error("Unable to get the attributes for %s", self.xml)
+            logging.error("line: Unable to get the attributes for %s", self.xml)
 
     def path(self):
         a = []
         a.append( ['M ', [self.x1, self.y1]] )
         a.append( ['L ', [self.x2, self.y2]] )
-        return simplepath.formatPath(a)
+        return self.path_tag(simplepath.formatPath(a))
 
 class polycommon(svgpath):
 
@@ -121,7 +124,7 @@ class polycommon(svgpath):
             for pa in points.split():
                 points.append(pa)
         else:
-            logging.error("Unable to get the attributes for %s", self.xml)
+            logging.error("polycommon: Unable to get the attributes for %s", self.xml)
 
 
 class polygon(polycommon):
@@ -134,6 +137,7 @@ class polygon(polycommon):
         for i in range( 1, len(self.points) ):
             d += " L " + self.points[i]
         d += " Z"
+        return self.path_tag(d)
 
 class polyline(polycommon):
 
@@ -144,9 +148,18 @@ class polyline(polycommon):
         d = "M " + self.points[0]
         for i in range( 1, len(self.points) ):
             d += " L " + self.points[i]
+        return self.path_tag(d)
 
 if __name__ == "__main__":
     svg_rect = """<rect x="1" y="1" width="200" height="300"/>""" 
     r = rect(svg_rect)
-    print svg_rect, r.path()
+    assert r.path() == """<path d="M 1 1 l 200 0 l 0 300 l -200 0 Z"/>"""
+
+    svg_line = """<line x1="0" y1="0" x2="200" y2="200"/>"""
+    l = line(svg_line)
+    print svg_line, l.path()
+
+    svg_circle = """<circle cx="100" cy="50" r="40"/>"""
+    c = circle(svg_circle)
+    assert c.path() == """<path d="M 60.000000,50.000000 A 40.000000,40.000000 0 1 0 140.000000,50.000000 A 40.000000,40.000000 0 1 0 60.000000,50.000000"/>"""
 
