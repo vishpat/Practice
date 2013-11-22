@@ -2,6 +2,7 @@
 
 import logging
 import xml.etree.ElementTree as ET
+import simplepath
 
 class svgpath(object):
     
@@ -46,7 +47,7 @@ class rect(svgpath):
         a.append( [' l ', [0, self.height]] )
         a.append( [' l ', [-self.width, 0]] )
         a.append( [' Z', []] )
-        return simplepath.formatPath(p)
+        return "<path d=\"" + simplepath.formatPath(a) + "\"/>"
 
 class ellipse(svgpath):
 
@@ -106,7 +107,7 @@ class line(svgpath):
         a = []
         a.append( ['M ', [self.x1, self.y1]] )
         a.append( ['L ', [self.x2, self.y2]] )
-        return simplepath.formatPath(a))
+        return simplepath.formatPath(a)
 
 class polycommon(svgpath):
 
@@ -145,6 +146,7 @@ class polyline(polycommon):
             d += " L " + self.points[i]
 
 if __name__ == "__main__":
-    r = rect("""<rect x="1" y="1" width="1198" height="398"/>""")
-    print r
+    svg_rect = """<rect x="1" y="1" width="200" height="300"/>""" 
+    r = rect(svg_rect)
+    print svg_rect, r.path()
 
