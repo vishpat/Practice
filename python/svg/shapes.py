@@ -39,19 +39,14 @@ class rect(svgpath):
             self.x = self.y = self.rx = self.ry = self.width = self.height = 0
             logging.error("Unable to get the attributes for %s", self.xml)
 
-class circle(svgpath):
-    def __init__(self, xml):
-        super(circle, self).__init__(xml)
-
-        if (not (self.xml_tree == None) and self.xml_tree.tag == 'circle'):
-            circle_el = self.xml_tree
-            self.cx  = int(circle_el.get('cx')) if circle_el.get('cx') else 0
-            self.cy  = int(circle_el.get('cy')) if circle_el.get('cy') else 0
-            self.r = int(circle_el.get('r')) if circle_el.get('r') else 0
-        else:
-            self.cx = self.cy = self.r = 0
-            logging.error("Unable to get the attributes for %s", self.xml)
-
+    def path(self):
+        a = list()
+        a.append( ['M ', [self.x, self.y]] )
+        a.append( [' l ', [self.width, 0]] )
+        a.append( [' l ', [0, self.height]] )
+        a.append( [' l ', [-self.width, 0]] )
+        a.append( [' Z', []] )
+        return simplepath.formatPath(p)
 
 class ellipse(svgpath):
 
@@ -66,6 +61,30 @@ class ellipse(svgpath):
             self.ry = int(ellipse_el.get('ry')) if ellipse_el.get('ry') else 0
         else:
             self.cx = self.cy = self.rx = self.ry = 0
+            logging.error("Unable to get the attributes for %s", self.xml)
+
+    def path(self):
+        x1 = self.cx - self.rx
+        x2 = self.cx + self.rx
+        p = 'M %f,%f ' % ( x1, self.cy ) + \
+            'A %f,%f ' % ( self.rx, self.ry ) + \
+            '0 1 0 %f,%f ' % ( x2, self.cy ) + \
+            'A %f,%f ' % ( self.rx, self.ry ) + \
+            '0 1 0 %f,%f' % ( x1, self.cy )
+        return p 
+
+class circle(ellipse):
+    def __init__(self, xml):
+        super(circle, self).__init__(xml)
+
+        if (not (self.xml_tree == None) and self.xml_tree.tag == 'circle'):
+            circle_el = self.xml_tree
+            self.cx  = int(circle_el.get('cx')) if circle_el.get('cx') else 0
+            self.cy  = int(circle_el.get('cy')) if circle_el.get('cy') else 0
+            self.rx = int(circle_el.get('r')) if circle_el.get('r') else 0
+            self.ry = self.rx
+        else:
+            self.cx = self.cy = self.r = 0
             logging.error("Unable to get the attributes for %s", self.xml)
 
 class line(svgpath):
@@ -83,6 +102,12 @@ class line(svgpath):
             self.x1 = self.y1 = self.x2 = self.y2 = 0
             logging.error("Unable to get the attributes for %s", self.xml)
 
+    def path(self):
+        a = []
+        a.append( ['M ', [self.x1, self.y1]] )
+        a.append( ['L ', [self.x2, self.y2]] )
+        return simplepath.formatPath(a))
+
 class polycommon(svgpath):
 
     def __init__(self, xml, polytype):
@@ -93,8 +118,7 @@ class polycommon(svgpath):
             polycommon_el = self.xml_tree
             points = int(polycommon_el.get('points')) if polycommon_el.get('points') else 0
             for pa in points.split():
-                x, y = pa.split(',')
-                points.append((int(x), int(y)))
+                points.append(pa)
         else:
             logging.error("Unable to get the attributes for %s", self.xml)
 
@@ -104,10 +128,21 @@ class polygon(polycommon):
     def __init__(self, xml):
          super(polygon, self).__init__(xml, 'ploygon')
 
+    def path(self):
+        d = "M " + self.points[0]
+        for i in range( 1, len(self.points) ):
+            d += " L " + self.points[i]
+        d += " Z"
+
 class polyline(polycommon):
 
     def __init__(self, xml):
          super(polyline, self).__init__(xml, 'ployline')
+
+    def path(self):
+        d = "M " + self.points[0]
+        for i in range( 1, len(self.points) ):
+            d += " L " + self.points[i]
 
 if __name__ == "__main__":
     r = rect("""<rect x="1" y="1" width="1198" height="398"/>""")
