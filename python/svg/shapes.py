@@ -169,5 +169,8 @@ if __name__ == "__main__":
 
     svg_polyline = """<polyline points="0,40 40,40 40,80 80,80 80,120 120,120 120,160"/>"""
     p = polyline(svg_polyline)
-    print svg_polyline, p.path()
+    assert p.path() == """<path d="M 0,40 L 40,40 L 40,80 L 80,80 L 80,120 L 120,120 L 120,160"/>"""
 
+    svg_polygon = """<polygon points="200,10 250,190 160,210"/>"""
+    p = polygon(svg_polygon)
+    assert p.path() == """<path d="M 200,10 L 250,190 L 160,210 Z"/>"""
