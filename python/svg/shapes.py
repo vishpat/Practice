@@ -120,9 +120,9 @@ class polycommon(svgpath):
 
         if (not (self.xml_tree == None) and self.xml_tree.tag == polytype):
             polycommon_el = self.xml_tree
-            points = int(polycommon_el.get('points')) if polycommon_el.get('points') else 0
+            points = polycommon_el.get('points') if polycommon_el.get('points') else list() 
             for pa in points.split():
-                points.append(pa)
+                self.points.append(pa)
         else:
             logging.error("polycommon: Unable to get the attributes for %s", self.xml)
 
@@ -130,7 +130,7 @@ class polycommon(svgpath):
 class polygon(polycommon):
 
     def __init__(self, xml):
-         super(polygon, self).__init__(xml, 'ploygon')
+         super(polygon, self).__init__(xml, 'polygon')
 
     def path(self):
         d = "M " + self.points[0]
@@ -142,7 +142,7 @@ class polygon(polycommon):
 class polyline(polycommon):
 
     def __init__(self, xml):
-         super(polyline, self).__init__(xml, 'ployline')
+         super(polyline, self).__init__(xml, 'polyline')
 
     def path(self):
         d = "M " + self.points[0]
@@ -162,4 +162,12 @@ if __name__ == "__main__":
     svg_circle = """<circle cx="100" cy="50" r="40"/>"""
     c = circle(svg_circle)
     assert c.path() == """<path d="M 60.000000,50.000000 A 40.000000,40.000000 0 1 0 140.000000,50.000000 A 40.000000,40.000000 0 1 0 60.000000,50.000000"/>"""
+
+    svg_ellipse = """<ellipse cx="300" cy="80" rx="100" ry="50"/>"""
+    c = ellipse(svg_ellipse)
+    assert c.path() == """<path d="M 200.000000,80.000000 A 100.000000,50.000000 0 1 0 400.000000,80.000000 A 100.000000,50.000000 0 1 0 200.000000,80.000000"/>"""
+
+    svg_polyline = """<polyline points="0,40 40,40 40,80 80,80 80,120 120,120 120,160"/>"""
+    p = polyline(svg_polyline)
+    print svg_polyline, p.path()
 
