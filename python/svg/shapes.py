@@ -17,11 +17,11 @@ class svgpath(object):
     def path(self):
         raise NotImplementedError
 
-    def path_tag(self, p):
+    def tag_path(self, p):
         return "<path d=\"" + p + "\"/>"
 
     def tagged_path(self):
-        raise NotImplementedError
+        return self.tag_path(self.path())
 
     def gcode(self):
         raise NotImplementedError
@@ -46,14 +46,14 @@ class rect(svgpath):
             self.x = self.y = self.rx = self.ry = self.width = self.height = 0
             logging.error("rect: Unable to get the attributes for %s", self.xml)
 
-    def tagged_path(self):
+    def path(self):
         a = list()
         a.append( ['M ', [self.x, self.y]] )
         a.append( [' l ', [self.width, 0]] )
         a.append( [' l ', [0, self.height]] )
         a.append( [' l ', [-self.width, 0]] )
         a.append( [' Z', []] )
-        return self.path_tag(simplepath.formatPath(a))
+        return simplepath.formatPath(a)     
 
 class ellipse(svgpath):
 
@@ -70,7 +70,7 @@ class ellipse(svgpath):
             self.cx = self.cy = self.rx = self.ry = 0
             logging.error("ellipse: Unable to get the attributes for %s", self.xml)
 
-    def tagged_path(self):
+    def path(self):
         x1 = self.cx - self.rx
         x2 = self.cx + self.rx
         p = 'M %f,%f ' % ( x1, self.cy ) + \
@@ -78,7 +78,7 @@ class ellipse(svgpath):
             '0 1 0 %f,%f ' % ( x2, self.cy ) + \
             'A %f,%f ' % ( self.rx, self.ry ) + \
             '0 1 0 %f,%f' % ( x1, self.cy )
-        return self.path_tag(p)
+        return p
 
 class circle(ellipse):
     def __init__(self, xml):
@@ -109,11 +109,11 @@ class line(svgpath):
             self.x1 = self.y1 = self.x2 = self.y2 = 0
             logging.error("line: Unable to get the attributes for %s", self.xml)
 
-    def tagged_path(self):
+    def path(self):
         a = []
         a.append( ['M ', [self.x1, self.y1]] )
         a.append( ['L ', [self.x2, self.y2]] )
-        return self.path_tag(simplepath.formatPath(a))
+        return simplepath.formatPath(a)
 
 class polycommon(svgpath):
 
@@ -135,23 +135,23 @@ class polygon(polycommon):
     def __init__(self, xml):
          super(polygon, self).__init__(xml, 'polygon')
 
-    def tagged_path(self):
+    def path(self):
         d = "M " + self.points[0]
         for i in range( 1, len(self.points) ):
             d += " L " + self.points[i]
         d += " Z"
-        return self.path_tag(d)
+        return d
 
 class polyline(polycommon):
 
     def __init__(self, xml):
          super(polyline, self).__init__(xml, 'polyline')
 
-    def tagged_path(self):
+    def path(self):
         d = "M " + self.points[0]
         for i in range( 1, len(self.points) ):
             d += " L " + self.points[i]
-        return self.path_tag(d)
+        return d
 
 if __name__ == "__main__":
     svg_rect = """<rect x="1" y="1" width="200" height="300"/>""" 
