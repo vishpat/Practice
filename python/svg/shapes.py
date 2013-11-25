@@ -20,6 +20,9 @@ class svgpath(object):
     def path_tag(self, p):
         return "<path d=\"" + p + "\"/>"
 
+    def tagged_path(self):
+        raise NotImplementedError
+
     def gcode(self):
         raise NotImplementedError
 
@@ -43,7 +46,7 @@ class rect(svgpath):
             self.x = self.y = self.rx = self.ry = self.width = self.height = 0
             logging.error("rect: Unable to get the attributes for %s", self.xml)
 
-    def path(self):
+    def tagged_path(self):
         a = list()
         a.append( ['M ', [self.x, self.y]] )
         a.append( [' l ', [self.width, 0]] )
@@ -67,7 +70,7 @@ class ellipse(svgpath):
             self.cx = self.cy = self.rx = self.ry = 0
             logging.error("ellipse: Unable to get the attributes for %s", self.xml)
 
-    def path(self):
+    def tagged_path(self):
         x1 = self.cx - self.rx
         x2 = self.cx + self.rx
         p = 'M %f,%f ' % ( x1, self.cy ) + \
@@ -106,7 +109,7 @@ class line(svgpath):
             self.x1 = self.y1 = self.x2 = self.y2 = 0
             logging.error("line: Unable to get the attributes for %s", self.xml)
 
-    def path(self):
+    def tagged_path(self):
         a = []
         a.append( ['M ', [self.x1, self.y1]] )
         a.append( ['L ', [self.x2, self.y2]] )
@@ -132,7 +135,7 @@ class polygon(polycommon):
     def __init__(self, xml):
          super(polygon, self).__init__(xml, 'polygon')
 
-    def path(self):
+    def tagged_path(self):
         d = "M " + self.points[0]
         for i in range( 1, len(self.points) ):
             d += " L " + self.points[i]
@@ -144,7 +147,7 @@ class polyline(polycommon):
     def __init__(self, xml):
          super(polyline, self).__init__(xml, 'polyline')
 
-    def path(self):
+    def tagged_path(self):
         d = "M " + self.points[0]
         for i in range( 1, len(self.points) ):
             d += " L " + self.points[i]
@@ -153,24 +156,24 @@ class polyline(polycommon):
 if __name__ == "__main__":
     svg_rect = """<rect x="1" y="1" width="200" height="300"/>""" 
     r = rect(svg_rect)
-    assert r.path() == """<path d="M 1 1 l 200 0 l 0 300 l -200 0 Z"/>"""
+    assert r.tagged_path() == """<path d="M 1 1 l 200 0 l 0 300 l -200 0 Z"/>"""
 
     svg_line = """<line x1="0" y1="0" x2="200" y2="200"/>"""
     l = line(svg_line)
-    print svg_line, l.path()
+    print svg_line, l.tagged_path()
 
     svg_circle = """<circle cx="100" cy="50" r="40"/>"""
     c = circle(svg_circle)
-    assert c.path() == """<path d="M 60.000000,50.000000 A 40.000000,40.000000 0 1 0 140.000000,50.000000 A 40.000000,40.000000 0 1 0 60.000000,50.000000"/>"""
+    assert c.tagged_path() == """<path d="M 60.000000,50.000000 A 40.000000,40.000000 0 1 0 140.000000,50.000000 A 40.000000,40.000000 0 1 0 60.000000,50.000000"/>"""
 
     svg_ellipse = """<ellipse cx="300" cy="80" rx="100" ry="50"/>"""
     c = ellipse(svg_ellipse)
-    assert c.path() == """<path d="M 200.000000,80.000000 A 100.000000,50.000000 0 1 0 400.000000,80.000000 A 100.000000,50.000000 0 1 0 200.000000,80.000000"/>"""
+    assert c.tagged_path() == """<path d="M 200.000000,80.000000 A 100.000000,50.000000 0 1 0 400.000000,80.000000 A 100.000000,50.000000 0 1 0 200.000000,80.000000"/>"""
 
     svg_polyline = """<polyline points="0,40 40,40 40,80 80,80 80,120 120,120 120,160"/>"""
     p = polyline(svg_polyline)
-    assert p.path() == """<path d="M 0,40 L 40,40 L 40,80 L 80,80 L 80,120 L 120,120 L 120,160"/>"""
+    assert p.tagged_path() == """<path d="M 0,40 L 40,40 L 40,80 L 80,80 L 80,120 L 120,120 L 120,160"/>"""
 
     svg_polygon = """<polygon points="200,10 250,190 160,210"/>"""
     p = polygon(svg_polygon)
-    assert p.path() == """<path d="M 200,10 L 250,190 L 160,210 Z"/>"""
+    assert p.tagged_path() == """<path d="M 200,10 L 250,190 L 160,210 Z"/>"""
