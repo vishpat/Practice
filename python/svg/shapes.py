@@ -3,6 +3,9 @@
 import logging
 import xml.etree.ElementTree as ET
 import simplepath
+import cubicsuperpath
+import cspsubdiv
+from bezmisc import beziersplitatt
 
 class svgpath(object):
     
@@ -153,6 +156,66 @@ class polyline(polycommon):
             d += " L " + self.points[i]
         return d
 
+def subdivideCubicPath( sp, flat, i=1 ):
+	"""
+	Break up a bezier curve into smaller curves, each of which
+	is approximately a straight line within a given tolerance
+	(the "smoothness" defined by [flat]).
+
+	This is a modified version of cspsubdiv.cspsubdiv(). I rewrote the recursive
+	call because it caused recursion-depth errors on complicated line segments.
+	"""
+
+	while True:
+		while True:
+			if i >= len( sp ):
+				return
+
+			p0 = sp[i - 1][1]
+			p1 = sp[i - 1][2]
+			p2 = sp[i][0]
+			p3 = sp[i][1]
+
+			b = ( p0, p1, p2, p3 )
+
+			if cspsubdiv.maxdist( b ) > flat:
+				break
+
+			i += 1
+
+		one, two = beziersplitatt( b, 0.5 )
+		sp[i - 1][2] = one[1]
+		sp[i][0] = two[2]
+		p = [one[2], one[3], two[1]]
+
+def lines(path):
+
+        if len(simplepath.parsePath(path)) == 0:
+                return
+
+        fPrevX = fPrevY = None 
+        fX = fY = 0
+        p = cubicsuperpath.parsePath(path)
+        for sp in p:
+                subdivideCubicPath( sp, 1 )
+
+                for csp in sp:
+
+                        fX = float( csp[1][0] ) / 1.0 
+                        fY = float( csp[1][1] ) / 1.0 
+                       
+                        if fPrevX and fPrevY:
+                            a = []
+                            a.append( ['M ', [fPrevX, fPrevY]] )
+                            a.append( ['L ', [fX, fY]] )
+                            d = simplepath.formatPath(a)
+                            print """<path d="%s" style="stroke:#660000; fill:none;" />""" % d
+
+                        fPrevX = fX
+                        fPrevY = fY
+
+
+
 if __name__ == "__main__":
     svg_rect = """<rect x="1" y="1" width="200" height="300"/>""" 
     r = rect(svg_rect)
@@ -169,6 +232,7 @@ if __name__ == "__main__":
     svg_ellipse = """<ellipse cx="300" cy="80" rx="100" ry="50"/>"""
     c = ellipse(svg_ellipse)
     assert c.tagged_path() == """<path d="M 200.000000,80.000000 A 100.000000,50.000000 0 1 0 400.000000,80.000000 A 100.000000,50.000000 0 1 0 200.000000,80.000000"/>"""
+    lines(c.path())
 
     svg_polyline = """<polyline points="0,40 40,40 40,80 80,80 80,120 120,120 120,160"/>"""
     p = polyline(svg_polyline)
