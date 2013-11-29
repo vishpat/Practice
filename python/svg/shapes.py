@@ -156,52 +156,26 @@ class polyline(polycommon):
             d += " L " + self.points[i]
         return d
 
-def subdivideCubicPath( sp, flat, i=1 ):
-	"""
-	Break up a bezier curve into smaller curves, each of which
-	is approximately a straight line within a given tolerance
-	(the "smoothness" defined by [flat]).
-
-	This is a modified version of cspsubdiv.cspsubdiv(). I rewrote the recursive
-	call because it caused recursion-depth errors on complicated line segments.
-	"""
-
-	while True:
-		while True:
-			if i >= len( sp ):
-				return
-
-			p0 = sp[i - 1][1]
-			p1 = sp[i - 1][2]
-			p2 = sp[i][0]
-			p3 = sp[i][1]
-
-			b = ( p0, p1, p2, p3 )
-
-			if cspsubdiv.maxdist( b ) > flat:
-				break
-
-			i += 1
-
-		one, two = beziersplitatt( b, 0.5 )
-		sp[i - 1][2] = one[1]
-		sp[i][0] = two[2]
-		p = [one[2], one[3], two[1]]
-
 def lines(path):
 
         if len(simplepath.parsePath(path)) == 0:
                 return
        
         simple_path = simplepath.parsePath(path)
-        print str(simple_path)
 
         startX,startY = float(simple_path[0][1][0]), float(simple_path[0][1][1])
 
         p = cubicsuperpath.parsePath(path)
+
+        print """
+            <html>
+            <body>
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="400" width="450">
+        """
+
         for sp in p:
                 
-                subdivideCubicPath( sp, .1 )
+                cspsubdiv.subdiv( sp, .5 )
                 for csp in sp:
                     ctrl_pt1 = csp[0]
                     ctrl_pt2 = csp[1]
@@ -211,6 +185,13 @@ def lines(path):
                         ctrl_pt2[0], ctrl_pt2[1], end_pt[0], end_pt[1])
                     startX, startY = end_pt                  
 
+        print """
+       </svg>
+
+       </body>
+       </html>
+        """
+
 
 if __name__ == "__main__":
     svg_rect = """<rect x="1" y="1" width="200" height="300"/>""" 
@@ -219,7 +200,6 @@ if __name__ == "__main__":
 
     svg_line = """<line x1="0" y1="0" x2="200" y2="200"/>"""
     l = line(svg_line)
-    print svg_line, l.tagged_path()
 
     svg_circle = """<circle cx="100" cy="50" r="40"/>"""
     c = circle(svg_circle)
