@@ -180,9 +180,9 @@ def lines(path):
                     ctrl_pt1 = csp[0]
                     ctrl_pt2 = csp[1]
                     end_pt = csp[2]
-                    print """<path d="M %f %f C %f %f %f %f %f %f" style="stroke:#666000; fill:none;" />""" % \
-                        (startX, startY, ctrl_pt1[0], ctrl_pt1[1], 
-                        ctrl_pt2[0], ctrl_pt2[1], end_pt[0], end_pt[1])
+
+                    print """<path d="M %f %f L %f %f" style="stroke:#666000; fill:none;" />""" % \
+                        (startX, startY, end_pt[0], end_pt[1])
                     startX, startY = end_pt                  
 
         print """
