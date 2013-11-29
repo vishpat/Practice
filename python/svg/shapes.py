@@ -192,28 +192,24 @@ def lines(path):
 
         if len(simplepath.parsePath(path)) == 0:
                 return
+       
+        simple_path = simplepath.parsePath(path)
+        print str(simple_path)
 
-        fPrevX = fPrevY = None 
-        fX = fY = 0
+        startX,startY = float(simple_path[0][1][0]), float(simple_path[0][1][1])
+
         p = cubicsuperpath.parsePath(path)
         for sp in p:
-                subdivideCubicPath( sp, 1 )
-
+                
+                subdivideCubicPath( sp, .1 )
                 for csp in sp:
-
-                        fX = float( csp[1][0] ) / 1.0 
-                        fY = float( csp[1][1] ) / 1.0 
-                       
-                        if fPrevX and fPrevY:
-                            a = []
-                            a.append( ['M ', [fPrevX, fPrevY]] )
-                            a.append( ['L ', [fX, fY]] )
-                            d = simplepath.formatPath(a)
-                            print """<path d="%s" style="stroke:#660000; fill:none;" />""" % d
-
-                        fPrevX = fX
-                        fPrevY = fY
-
+                    ctrl_pt1 = csp[0]
+                    ctrl_pt2 = csp[1]
+                    end_pt = csp[2]
+                    print """<path d="M %f %f C %f %f %f %f %f %f" style="stroke:#666000; fill:none;" />""" % \
+                        (startX, startY, ctrl_pt1[0], ctrl_pt1[1], 
+                        ctrl_pt2[0], ctrl_pt2[1], end_pt[0], end_pt[1])
+                    startX, startY = end_pt                  
 
 
 if __name__ == "__main__":
