@@ -27,6 +27,20 @@ class svgshape(object):
     def __str__(self):
         return self.xml        
 
+class path(svgshape):
+     def __init__(self, xml):
+        super(path, self).__init__(xml)
+
+        if (not (self.xml_tree == None) and self.xml_tree.tag == 'path'):
+            path_el = self.xml_tree
+            self.d = path_el.get('d')
+        else:
+            self.d = None 
+            logging.error("path: Unable to get the attributes for %s", self.xml)
+
+     def d_path(self):
+        return self.d     
+
 class rect(svgshape):
   
     def __init__(self, xml):
