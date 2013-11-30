@@ -8,7 +8,7 @@ import cspsubdiv
 from bezmisc import beziersplitatt
 
 
-class svgpath(object):
+class svgshape(object):
     
     def __init__(self, xml):
         self.xml = xml.lower()
@@ -18,22 +18,16 @@ class svgpath(object):
         except:
             logging.error("Unable to parse xml %s", xml)
 
-    def path(self):
+    def d_path(self):
         raise NotImplementedError
 
-    def tag_path(self, p):
-        return "<path d=\"" + p + "\"/>"
-
-    def tagged_path(self):
-        return self.tag_path(self.path())
-
-    def gcode(self):
-        raise NotImplementedError
+    def svg_path(self):
+        return "<path d=\"" + self.d_path() + "\"/>"
 
     def __str__(self):
         return self.xml        
 
-class rect(svgpath):
+class rect(svgshape):
   
     def __init__(self, xml):
         super(rect, self).__init__(xml)
@@ -50,7 +44,7 @@ class rect(svgpath):
             self.x = self.y = self.rx = self.ry = self.width = self.height = 0
             logging.error("rect: Unable to get the attributes for %s", self.xml)
 
-    def path(self):
+    def d_path(self):
         a = list()
         a.append( ['M ', [self.x, self.y]] )
         a.append( [' l ', [self.width, 0]] )
@@ -59,7 +53,7 @@ class rect(svgpath):
         a.append( [' Z', []] )
         return simplepath.formatPath(a)     
 
-class ellipse(svgpath):
+class ellipse(svgshape):
 
     def __init__(self, xml):
         super(ellipse, self).__init__(xml)
@@ -74,7 +68,7 @@ class ellipse(svgpath):
             self.cx = self.cy = self.rx = self.ry = 0
             logging.error("ellipse: Unable to get the attributes for %s", self.xml)
 
-    def path(self):
+    def d_path(self):
         x1 = self.cx - self.rx
         x2 = self.cx + self.rx
         p = 'M %f,%f ' % ( x1, self.cy ) + \
@@ -98,7 +92,7 @@ class circle(ellipse):
             self.cx = self.cy = self.r = 0
             logging.error("Circle: Unable to get the attributes for %s", self.xml)
 
-class line(svgpath):
+class line(svgshape):
 
     def __init__(self, xml):
         super(line, self).__init__(xml)
@@ -113,13 +107,13 @@ class line(svgpath):
             self.x1 = self.y1 = self.x2 = self.y2 = 0
             logging.error("line: Unable to get the attributes for %s", self.xml)
 
-    def path(self):
+    def d_path(self):
         a = []
         a.append( ['M ', [self.x1, self.y1]] )
         a.append( ['L ', [self.x2, self.y2]] )
         return simplepath.formatPath(a)
 
-class polycommon(svgpath):
+class polycommon(svgshape):
 
     def __init__(self, xml, polytype):
         super(polycommon, self).__init__(xml)
@@ -139,7 +133,7 @@ class polygon(polycommon):
     def __init__(self, xml):
          super(polygon, self).__init__(xml, 'polygon')
 
-    def path(self):
+    def d_path(self):
         d = "M " + self.points[0]
         for i in range( 1, len(self.points) ):
             d += " L " + self.points[i]
@@ -151,20 +145,21 @@ class polyline(polycommon):
     def __init__(self, xml):
          super(polyline, self).__init__(xml, 'polyline')
 
-    def path(self):
+    def d_path(self):
         d = "M " + self.points[0]
         for i in range( 1, len(self.points) ):
             d += " L " + self.points[i]
         return d
 
-def lines(path):
+def point_generator(path):
 
         if len(simplepath.parsePath(path)) == 0:
                 return
        
         simple_path = simplepath.parsePath(path)
         startX,startY = float(simple_path[0][1][0]), float(simple_path[0][1][1])
-        
+        yield startX, startY
+
         p = cubicsuperpath.parsePath(path)
         for sp in p:
                 cspsubdiv.subdiv( sp, .2 )
@@ -172,29 +167,28 @@ def lines(path):
                     ctrl_pt1 = csp[0]
                     ctrl_pt2 = csp[1]
                     end_pt = csp[2]
-                    startX, startY = end_pt                  
+                    yield end_pt[0], end_pt[1],    
 
 if __name__ == "__main__":
     svg_rect = """<rect x="1" y="1" width="200" height="300"/>""" 
     r = rect(svg_rect)
-    assert r.tagged_path() == """<path d="M 1 1 l 200 0 l 0 300 l -200 0 Z"/>"""
+    assert r.svg_path() == """<path d="M 1 1 l 200 0 l 0 300 l -200 0 Z"/>"""
 
     svg_line = """<line x1="0" y1="0" x2="200" y2="200"/>"""
     l = line(svg_line)
 
     svg_circle = """<circle cx="100" cy="50" r="40"/>"""
     c = circle(svg_circle)
-    assert c.tagged_path() == """<path d="M 60.000000,50.000000 A 40.000000,40.000000 0 1 0 140.000000,50.000000 A 40.000000,40.000000 0 1 0 60.000000,50.000000"/>"""
-    lines(c.path())
+    assert c.svg_path() == """<path d="M 60.000000,50.000000 A 40.000000,40.000000 0 1 0 140.000000,50.000000 A 40.000000,40.000000 0 1 0 60.000000,50.000000"/>"""
     
     svg_ellipse = """<ellipse cx="300" cy="80" rx="100" ry="50"/>"""
     c = ellipse(svg_ellipse)
-    assert c.tagged_path() == """<path d="M 200.000000,80.000000 A 100.000000,50.000000 0 1 0 400.000000,80.000000 A 100.000000,50.000000 0 1 0 200.000000,80.000000"/>"""
+    assert c.svg_path() == """<path d="M 200.000000,80.000000 A 100.000000,50.000000 0 1 0 400.000000,80.000000 A 100.000000,50.000000 0 1 0 200.000000,80.000000"/>"""
 
     svg_polyline = """<polyline points="0,40 40,40 40,80 80,80 80,120 120,120 120,160"/>"""
     p = polyline(svg_polyline)
-    assert p.tagged_path() == """<path d="M 0,40 L 40,40 L 40,80 L 80,80 L 80,120 L 120,120 L 120,160"/>"""
+    assert p.svg_path() == """<path d="M 0,40 L 40,40 L 40,80 L 80,80 L 80,120 L 120,120 L 120,160"/>"""
 
     svg_polygon = """<polygon points="200,10 250,190 160,210"/>"""
     p = polygon(svg_polygon)
-    assert p.tagged_path() == """<path d="M 200,10 L 250,190 L 160,210 Z"/>"""
+    assert p.svg_path() == """<path d="M 200,10 L 250,190 L 160,210 Z"/>"""
