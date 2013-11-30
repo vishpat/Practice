@@ -7,6 +7,7 @@ import cubicsuperpath
 import cspsubdiv
 from bezmisc import beziersplitatt
 
+
 class svgpath(object):
     
     def __init__(self, xml):
@@ -162,36 +163,16 @@ def lines(path):
                 return
        
         simple_path = simplepath.parsePath(path)
-
         startX,startY = float(simple_path[0][1][0]), float(simple_path[0][1][1])
-
+        
         p = cubicsuperpath.parsePath(path)
-
-        print """
-            <html>
-            <body>
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="400" width="450">
-        """
-
         for sp in p:
-                
-                cspsubdiv.subdiv( sp, .5 )
+                cspsubdiv.subdiv( sp, .2 )
                 for csp in sp:
                     ctrl_pt1 = csp[0]
                     ctrl_pt2 = csp[1]
                     end_pt = csp[2]
-
-                    print """<path d="M %f %f L %f %f" style="stroke:#666000; fill:none;" />""" % \
-                        (startX, startY, end_pt[0], end_pt[1])
                     startX, startY = end_pt                  
-
-        print """
-       </svg>
-
-       </body>
-       </html>
-        """
-
 
 if __name__ == "__main__":
     svg_rect = """<rect x="1" y="1" width="200" height="300"/>""" 
@@ -204,11 +185,11 @@ if __name__ == "__main__":
     svg_circle = """<circle cx="100" cy="50" r="40"/>"""
     c = circle(svg_circle)
     assert c.tagged_path() == """<path d="M 60.000000,50.000000 A 40.000000,40.000000 0 1 0 140.000000,50.000000 A 40.000000,40.000000 0 1 0 60.000000,50.000000"/>"""
-
+    lines(c.path())
+    
     svg_ellipse = """<ellipse cx="300" cy="80" rx="100" ry="50"/>"""
     c = ellipse(svg_ellipse)
     assert c.tagged_path() == """<path d="M 200.000000,80.000000 A 100.000000,50.000000 0 1 0 400.000000,80.000000 A 100.000000,50.000000 0 1 0 200.000000,80.000000"/>"""
-    lines(c.path())
 
     svg_polyline = """<polyline points="0,40 40,40 40,80 80,80 80,120 120,120 120,160"/>"""
     p = polyline(svg_polyline)
