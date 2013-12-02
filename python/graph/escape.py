@@ -155,7 +155,6 @@ class Escape:
         ]
 
         for harmful, deadly, cost in tests:
-            print "Testing ", str(harmful), str(deadly)
             min_cos = self.lowest(harmful, deadly)
             assert min_cos == cost, "Did not find the expected lowest cost min_cost %d  expected %d" % (min_cos, cost)
 
