@@ -7,5 +7,5 @@ def run_cmd(cmd):
     os.system(cmd)
 
 run_cmd("ant dist")
-run_cmd("export CLASSPATH=$CLASSPATH:./build;java com.vishpat.backtracing.Queens")
+run_cmd("export CLASSPATH=$CLASSPATH:./build;$JAVA_HOME/bin/java com.vishpat.backtracing.Queens")
 
