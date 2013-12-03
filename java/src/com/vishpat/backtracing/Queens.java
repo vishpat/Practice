@@ -1,8 +1,9 @@
 package com.vishpat.backtracing;
 
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.HashSet;
 import java.util.Vector;
+import java.util.Stack;
 
 class Pos {
     public int x;
@@ -25,12 +26,19 @@ class Node {
         this.board_size = board_size;
     }
 
+    public void printConfiguration() {
+        for (Pos p: this.configuration) {
+            System.out.format("(%d, %d), ", p.x, p.y);
+        }
+        System.out.println();
+    }
+
     public Set<Node> getChildren() {
-        TreeSet<Node> children = new TreeSet<Node>();
+        HashSet<Node> children = new HashSet<Node>();
         Set<Pos> positions = this.getNextValidPositions();
 
         for (Pos p: positions){
-            TreeSet<Pos> nextConfiguration = new TreeSet<Pos>();
+            HashSet<Pos> nextConfiguration = new HashSet<Pos>();
             nextConfiguration.addAll(this.configuration);
             nextConfiguration.add(p);
             Node childNode = new Node(nextConfiguration, this.board_size); 
@@ -51,7 +59,7 @@ class Node {
         int ypos = 0;
         
         for (Pos pos: this.configuration) {
-            Set<Pos> validPositions = new TreeSet<Pos>();
+            Set<Pos> validPositions = new HashSet<Pos>();
             for (int i = 0; i < this.board_size; i++) {
                 for (int j = 0; j < this.board_size; j++) {
                     if (i == pos.x || j == pos.y) {
@@ -70,7 +78,7 @@ class Node {
         }
       
         if (positions.size() == 0) {
-            return new TreeSet<Pos>();
+            return new HashSet<Pos>();
         }
 
         Set<Pos> validPosSet = positions.elementAt(0);    
@@ -85,6 +93,30 @@ class Node {
 
 class Queens {
     public static void main(String[] args) {
-        System.out.println("Hello java!!!\n");
+        int board_size = 4;
+        
+        Stack<Node> stack = new Stack<Node>(); 
+       
+        for (int i = 0; i < board_size; i++) {
+            for (int j = 0; j < board_size; j++) {
+                HashSet<Pos> set = new HashSet<Pos>();
+                set.add(new Pos(i, j));
+                Node n = new Node(set, board_size);
+                stack.push(n);
+           }
+        }
+        
+        while (!stack.isEmpty()) {
+            Node n = stack.pop();
+            n.printConfiguration();
+
+            if (n.isLeaf()) {
+                n.printConfiguration();
+            } else {
+                for (Node child: n.getChildren()) {
+                    stack.push(child);
+                }
+            }
+        }
     }
 }
