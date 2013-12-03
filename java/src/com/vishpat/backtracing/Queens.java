@@ -13,6 +13,20 @@ class Pos {
         this.x = x;
         this.y = y;
     }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof Pos) {
+            Pos p = (Pos)obj;
+            if (p.x == this.x && p.y == this.y) {
+                return true;
+            } 
+        }
+        return false;
+    }
+
+    public int hashCode() {
+        return 10*this.x + this.y;
+    }
 }
 
 class Node {
@@ -93,7 +107,7 @@ class Node {
 
 class Queens {
     public static void main(String[] args) {
-        int board_size = 4;
+        int board_size = 8;
         
         Stack<Node> stack = new Stack<Node>(); 
        
@@ -108,10 +122,10 @@ class Queens {
         
         while (!stack.isEmpty()) {
             Node n = stack.pop();
-            n.printConfiguration();
 
             if (n.isLeaf()) {
                 n.printConfiguration();
+                break;
             } else {
                 for (Node child: n.getChildren()) {
                     stack.push(child);
