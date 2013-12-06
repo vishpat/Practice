@@ -1,5 +1,5 @@
 #include <string.h>
-#include "string.h"
+#include "vp_string.h"
 
 void
 swap(char *x, char *y)
