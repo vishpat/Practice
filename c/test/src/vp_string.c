@@ -10,7 +10,7 @@ swap(char *x, char *y)
 }
 
 void
-string_permutations(char *str, int start_idx, int end_idx)
+vp_string_permutations(char *str, int start_idx, int end_idx)
 {
     int i = start_idx;
 
@@ -24,7 +24,7 @@ string_permutations(char *str, int start_idx, int end_idx)
            if (i != start_idx) {
                 printf("%s\n",  str);
            }
-           string_permutations(str, start_idx + 1, end_idx);
+           vp_string_permutations(str, start_idx + 1, end_idx);
            swap(&str[i], &str[start_idx]);
            i++;
     }
