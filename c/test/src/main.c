@@ -1,10 +1,12 @@
 #include <string.h>
+#include <stdio.h>
 #include "vp_string.h"
+#include "vp_misc.h"
 
 int
 main(int argc, char ** argv) {
-    char s[] = {'a', 'b', 'c', 'd', 0};
-    vp_string_permutations(s, 0, strlen(s) - 1);
+    
+    printf("%d\n", vp_binomial_coefficient(20, 16));
     return 0;
 }
 
