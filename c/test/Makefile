@@ -35,7 +35,7 @@ SRC = $(wildcard $(SRC_DIR)/*.c $(LIB_DIR)/*.c $(SRC_DIR)/*.cpp)
 
 #Define the object files here
 OBJ = $(patsubst %.c,%.o,$(patsubst %.cc,%.o,$(SRC)))	
-LIBOBJ = vp_string.o vp_misc.o
+LIBOBJ = vp_string.o vp_misc.o vp_list.o vp_queue.o vp_tree.o
 
 #Define the output file nae
 OUTPUT = main
