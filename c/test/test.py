@@ -2,4 +2,4 @@
 
 import os
 
-os.system("make && ./bin/main")
+os.system("./compile.py && ./test")
