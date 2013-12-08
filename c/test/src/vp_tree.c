@@ -46,9 +46,27 @@ vp_tree_create(vp_tree_item_val_t item_val)
     return vp_tree;
 }
 
+static void
+vp_tree_free_node(vp_tree_node_t *node)
+{
+    vp_tree_node_t *left = node->left;
+    vp_tree_node_t *right = node->right;
+
+    if (left) {
+        vp_tree_free_node(left);        
+    }
+    
+    free(node);
+
+    if (right) {
+        vp_tree_free_node(right);
+    }
+}
+
 void
 vp_tree_free(vp_tree_t *vp_tree)
 {
+    vp_tree_free_node(vp_tree->root);
     free(vp_tree);
 }
 
