@@ -7,6 +7,8 @@ typedef struct vp_list_s vp_list_t;
 typedef void (*vp_list_node_apply)(void *);
 
 vp_list_t* vp_list_create(void);
+void vp_list_free(vp_list_t *vp_list, 
+                  vp_list_node_apply item_free_func);
 
 bool vp_list_empty(vp_list_t *);
 

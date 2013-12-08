@@ -22,6 +22,28 @@ vp_list_create()
     return vp_list_p;
 }
 
+static void
+_vp_list_free_all(vp_list_node_t *node, vp_list_node_apply item_free_func)
+{
+    if (node->next) {
+        _vp_list_free_all(node->next, item_free_func);
+        node->next = NULL;
+    } else {
+        if (item_free_func) {
+            item_free_func(node->item);
+        }
+        free(node); 
+    }
+}
+
+void 
+vp_list_free(vp_list_t *vp_list, 
+                  vp_list_node_apply item_free_func)
+{
+    _vp_list_free_all(vp_list->head, item_free_func);
+    free(vp_list);
+}
+
 bool
 vp_list_empty(vp_list_t *vp_list)
 {
