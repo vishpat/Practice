@@ -329,4 +329,6 @@ vp_tree_op_bfs(vp_tree_t *vp_tree, vp_tree_item_op_t vp_tree_item_op_func)
             vp_queue_enqueue(q, node->right);
         }
     }
+
+    vp_queue_free(q);
 }

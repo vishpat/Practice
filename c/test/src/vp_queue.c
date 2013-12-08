@@ -8,6 +8,12 @@ vp_queue_create()
     return vp_list_create();
 }
 
+void 
+vp_queue_free(vp_queue_t *queue)
+{
+    vp_list_free(queue, NULL);
+}
+
 void
 vp_queue_enqueue(vp_queue_t *q, void *item)
 {
