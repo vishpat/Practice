@@ -11,6 +11,20 @@ int cmp(const void *x, const void *y)
     return *((int *)x) - *((int *)y);
 }
 
+int 
+int_val(const void *v)
+{
+    return *((int *)v);    
+}
+
+void
+print_int_val(const void *v)
+{
+    printf("%d\n", *((int *)v));       
+}
+
+
+
 #define NUM_CNT 10 
 int
 main(int argc, char ** argv) 
@@ -26,6 +40,14 @@ main(int argc, char ** argv)
     for (i = 0; i < NUM_CNT; i++) {
         printf("%d\n", nums[i]);
     }
+
+    vp_bst_t *bst = vp_bst_create(int_val);
+    for (i = 0; i < NUM_CNT; i++) {
+       vp_bst_insert(bst, &nums[i]); 
+    }
+
+    vp_bst_op_bfs(bst, print_int_val); 
+
 
     return 0;
 }

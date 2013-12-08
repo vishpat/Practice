@@ -4,8 +4,8 @@
 #include <stdbool.h>
 
 typedef struct vp_bst_s vp_bst_t;
-typedef int (*vp_bst_item_val_t)(void *item);
-typedef void (*vp_bst_item_op_t)(void *item);
+typedef int (*vp_bst_item_val_t)(const void *item);
+typedef void (*vp_bst_item_op_t)(const void *item);
 
 vp_bst_t* vp_bst_create(vp_bst_item_val_t item_val_func);
 void vp_bst_free(vp_bst_t *vp_bst);

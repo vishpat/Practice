@@ -2,4 +2,4 @@
 
 import os
 
-os.system("./compile.py && ./test")
+os.system("./compile.py && ./run")

@@ -40,7 +40,9 @@ void
 vp_list_free(vp_list_t *vp_list, 
                   vp_list_node_apply item_free_func)
 {
-    _vp_list_free_all(vp_list->head, item_free_func);
+    if (vp_list->head) {
+        _vp_list_free_all(vp_list->head, item_free_func);
+    }
     free(vp_list);
 }
 

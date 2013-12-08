@@ -5,7 +5,7 @@ import sys
 import platform
 import fnmatch
 
-program = "test"
+program = "run"
 
 system_name = platform.system()
 
