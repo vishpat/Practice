@@ -1,6 +1,7 @@
 package com.vishpat.dp;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 
 class CoinChange {
    
@@ -11,9 +12,14 @@ class CoinChange {
         Arrays.sort(coins);
     }
 
-    public void solve(int change)
+    public ArrayList<int> solve(int change)
     {
-        
+        int i = 0;
+
+        for (c : this.coins) {
+            minCoins[i].add(c);
+            minCoins[i].addAll(solve(change - c);
+        }
     }
 
     public static void main(String[] args) {
