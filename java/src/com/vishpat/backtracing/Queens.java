@@ -29,13 +29,13 @@ class Pos {
     }
 }
 
-class Node {
+class QueensNode {
 
     private Set<Pos> configuration;
-    private Set<Node> children;
+    private Set<QueensNode> children;
     private int board_size;
 
-    public Node(Set<Pos> configuration, int board_size) {
+    public QueensNode(Set<Pos> configuration, int board_size) {
         this.configuration = configuration;
         this.board_size = board_size;
     }
@@ -47,16 +47,16 @@ class Node {
         System.out.println();
     }
 
-    public Set<Node> getChildren() {
-        HashSet<Node> children = new HashSet<Node>();
+    public Set<QueensNode> getChildren() {
+        HashSet<QueensNode> children = new HashSet<QueensNode>();
         Set<Pos> positions = this.getNextValidPositions();
 
         for (Pos p: positions){
             HashSet<Pos> nextConfiguration = new HashSet<Pos>();
             nextConfiguration.addAll(this.configuration);
             nextConfiguration.add(p);
-            Node childNode = new Node(nextConfiguration, this.board_size); 
-            children.add(childNode);
+            QueensNode childQueensNode = new QueensNode(nextConfiguration, this.board_size); 
+            children.add(childQueensNode);
         }
 
         return children; 
@@ -109,25 +109,25 @@ class Queens {
     public static void main(String[] args) {
         int board_size = 8;
         
-        Stack<Node> stack = new Stack<Node>(); 
+        Stack<QueensNode> stack = new Stack<QueensNode>(); 
        
         for (int i = 0; i < board_size; i++) {
             for (int j = 0; j < board_size; j++) {
                 HashSet<Pos> set = new HashSet<Pos>();
                 set.add(new Pos(i, j));
-                Node n = new Node(set, board_size);
+                QueensNode n = new QueensNode(set, board_size);
                 stack.push(n);
            }
         }
         
         while (!stack.isEmpty()) {
-            Node n = stack.pop();
+            QueensNode n = stack.pop();
 
             if (n.isLeaf()) {
                 n.printConfiguration();
                 break;
             } else {
-                for (Node child: n.getChildren()) {
+                for (QueensNode child: n.getChildren()) {
                     stack.push(child);
                 }
             }
