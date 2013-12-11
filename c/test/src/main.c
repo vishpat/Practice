@@ -23,8 +23,6 @@ print_int_val(const void *v)
     printf("%d\n", *((int *)v));       
 }
 
-
-
 #define NUM_CNT 10 
 int
 main(int argc, char ** argv) 
@@ -47,7 +45,6 @@ main(int argc, char ** argv)
     }
 
     vp_bst_op_bfs(bst, print_int_val); 
-
 
     return 0;
 }
