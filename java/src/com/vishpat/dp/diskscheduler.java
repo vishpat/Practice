@@ -4,60 +4,52 @@ import java.util.HashSet;
 import java.util.Arrays;
 
 class DiskScheduler {
+    static int start_sec = 140;
+    static int requests[] = {100, 50, 190};
+    static int min[][] = new int[requests.length][requests.length];
 
-    static int 
-    seeks(int start_sec, int next_req, HashSet<Integer> requests)
+    static int min_seeks(int i, int j)
     {
-        if (requests.size() == 0) {
-            return Math.abs(start_sec - next_req);
-        }
-
-        int min_seeks = Integer.MAX_VALUE;
-        int cur_seeks = 0;
-
-        for (int req: requests) {
-            
-            HashSet<Integer> remaining = new HashSet<Integer>();
-            remaining.addAll(requests);
-            remaining.remove(req);
-            
-            cur_seeks = seeks(next_req, req, remaining);
-
-            if (cur_seeks < min_seeks) {
-                min_seeks = cur_seeks;
-            }
+        if (min[i][j] == -1) {
+            min[i][j] = min[j][i] = Math.abs(requests[i] - requests[j]);
         }
         
-        return Math.abs(start_sec - next_req) + min_seeks;
+        return min[i][j];
     }
 
     static void solve()
-    {
-        int min_seeks = Integer.MAX_VALUE;
-        int start_sec = 140;
-        int requests[] = {100, 50, 190};
+    {   
+        int min_dist = Integer.MAX_VALUE;
         int cur_seeks = 0;
-
-        for (int req: requests) {
-            
-            HashSet<Integer> remaining = new HashSet<Integer>();
-
-            for (int req2: requests) {
-                if (req2 == req) {
+ 
+        for (int i = 0; i < requests.length; i++) {
+            for (int j = 0; j < requests.length; j++) {
+                
+                if (i == j) {
                     continue;
                 }
-                remaining.add(new Integer(req2));
-            }
-            
-            cur_seeks = seeks(start_sec, req, remaining);
 
-            if (cur_seeks < min_seeks) {
-                min_seeks = cur_seeks;
+                min[i][j] = -1;
             }
         }
-        
-        System.out.format("%d\n", min_seeks);
 
+        for (int i = 0; i < requests.length; i++) {
+            for (int j = 0; j < requests.length; j++) {
+                
+                if (i == j) {
+                    continue;
+                }
+
+                int dist = Math.abs(start_sec - requests[i]) +
+                            min_seeks(i, j);
+
+                if (dist < min_dist) {
+                    min_dist = dist;
+                }
+            }
+        }
+
+        System.out.format("%d\n", min_dist);
     }
 
     public static void main(String[] args) 
