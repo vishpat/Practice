@@ -8,25 +8,34 @@ enum sign {
 class zigzag {
 
     public static int longestZigZag(int[] sequence) {
-
+        int max_seq = 0;
         if (sequence.length < 2) {
             return 1;
         }
 
-        sign current_sign = (sequence[1] > sequence[0]) ? 
-                            sign.positive : sign.negative;
-
         int dp[] = new int[sequence.length];
-        for (int i = 1; i < sequence.length; i++) {
-        
+        for (int i = 2; i < sequence.length; i++) {
+            for (int j = i - 1; j > 0; j--) {
+                if (((sequence[i] > sequence[j] &&
+                    sequence[j] < sequence[j - 1]) || 
+                    (sequence[i] < sequence[j] &&
+                    sequence[j] > sequence[j - 1])) &&
+                    dp[i] < dp[j] + 1) {
+                    dp[i] = dp[j] + 1;
+
+                    if (dp[i] > max_seq) {
+                        max_seq = dp[i];
+                    }
+                } 
+            }
         }
 
-        return 0;
+        return max_seq;
     }
 
     public static void main(String[] args) 
     {
         int[] sequence = {1,7,4,9,2,5};
-        longestZigZag(sequence);
+        System.out.format("%d\n", longestZigZag(sequence));
     }
 }
