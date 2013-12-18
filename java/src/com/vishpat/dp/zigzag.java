@@ -4,8 +4,13 @@ class zigzag {
 
     public static int longestZigZag(int[] sequence) {
         int max_seq = 0;
-        if (sequence.length < 2) {
+
+        if (sequence.length == 1) {
             return 1;
+        }
+
+        if (sequence.length == 1) {
+            return 2;
         }
 
         int dp[] = new int[sequence.length];
