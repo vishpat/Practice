@@ -20,19 +20,19 @@ neighbors = {
 
 neighbor_cnt = {}
 
-element_cnt = 10
-
 
 def init(N):
-    for i in range(0, element_cnt):
+    for i in range(0, len(neighbors.keys())):
         cnt_bucket = {}
-        cnt_bucket[0] = 1
-        cnt_bucket[1] = len(neighbors[i])
+        cnt_bucket[0] = 0
+        cnt_bucket[1] = 1
+        cnt_bucket[2] = 1 + len(neighbors[i])
 
         neighbor_cnt[i] = cnt_bucket
 
 
-def get_neighbor_cnt(num, N):
+def fill_neighbor_cnt(num, N):
+
     cnt_bucket = neighbor_cnt[num]
 
     if N in cnt_bucket:
@@ -40,23 +40,26 @@ def get_neighbor_cnt(num, N):
     else:
         cnt = 0
         for neighbor in neighbors[num]:
-            cnt += 1 + get_neighbor_cnt(neighbor, N - 1)
+            cnt += 1 + fill_neighbor_cnt(neighbor, N - 1)
         cnt_bucket[N] = cnt
         neighbor_cnt[num] = cnt_bucket
         return cnt
 
 
 def main(N):
-    if N == 0:
-        return 0
-    elif N == 1:
-        return element_cnt
-    else:
+    for i in neighbors.keys():
         total = 0
-        for i in neighbors.keys():
-            total += 1 + get_neighbor_cnt(i, N - 1)
-        return total
+        for neighbor in neighbors[i]:
+            total += 1 + fill_neighbor_cnt(neighbor, N - 1)
+        neighbor_cnt[i][N] = total
+
+    total = 0
+    for x in neighbor_cnt.keys():
+        total += neighbor_cnt[x][N]
+
+    return total
 
 if __name__ == "__main__":
     init(int(sys.argv[1]))
+    print neighbor_cnt
     print main(int(sys.argv[1]))
