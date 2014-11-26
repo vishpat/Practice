@@ -22,23 +22,25 @@ def fib_mod(n, m):
 
 def period_verify(period, m):
     for i in range(1, period):
-        for j in range(period + 1, period + period):
-            n1 = fib_mod(i, m)
-            n2 = fib_mod(j, m)
-            if n1 != n2:
-                return False
+        n1 = fib_mod(i, m)
+        n2 = fib_mod(i + period, m)
+        if n1 != n2:
+            return False
 
     return True
 
 
 def pisano(m):
+    if m == 1:
+        return 1
+
     period = 2 
+    
     while not period_verify(period, m):
-        period += 1 
+        period += 1
+
     return period        
 
 
 if __name__ == "__main__":
     print pisano(int(sys.argv[1]))
-#    for i in range(1, 20):
-#        print fibonnaci(i), fib_mod(i, 3)
