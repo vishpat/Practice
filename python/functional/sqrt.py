@@ -1,5 +1,11 @@
-__author__ = 'vpati011'
+__author__ = 'vishpat'
 
+"""
+Implements the Newton Rapshon's Square Roots method using Functional Programming
+as described in the paper
+
+https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf
+"""
 
 def repeat(a0, n):
     while True:
