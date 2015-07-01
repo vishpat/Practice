@@ -4,3 +4,9 @@
                           (else z)
                     )
 )
+
+; Exercise 1.3
+(define (square-large-two x y z) (- (+ (* x x) (* y y) (* z z)) 
+                                    (* (min-three x y z) (min-three x y z))
+                                 )
+)
