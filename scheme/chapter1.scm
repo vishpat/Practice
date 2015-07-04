@@ -1,3 +1,4 @@
+#lang scheme
 (define (max-two x y) (if (> x y) x y))
 (define (min-three x y z) (cond ((and (< x y) (< x z)) x)
                           ((and (< y x) (< y z)) y)
@@ -38,4 +39,15 @@
 )
 (define (cube-root x) (cube-root-iter 1.0 x))
 
+; Factorial recurisve
+(define (factorial-recursive x) (if (<= x 1) 1 (* x (factorial-recursive (- x 1)))))
+
+; Factorial iterative
+  
+(define (factorial-iterative x)
+  (define (factorial-iter x counter product)
+    (if (< counter x) (factorial-iter x (+ counter 1) (* counter product)) (* counter product))
+  )
+  (factorial-iter x 1 1)
+)
 
