@@ -19,16 +19,12 @@ if __name__ == "__main__":
             idx += 1
 
         x = num + 1
-        next_prime_found = False
+        num = k
         while x < k:
             if prime_list[x] is True:
                 num = x
-                next_prime_found = True
                 break
             x += 1
-
-        if next_prime_found is False:
-            break
 
     final_sum = 0
     for idx, val in enumerate(prime_list):
