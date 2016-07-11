@@ -1,12 +1,17 @@
-(ns project-euler.core
-  (:gen-class))
+(ns project-euler.core)
 
-(defn problem-11
-	[]
-	(println "problem 11")
-)
+(defn square-numbers
+  [[& numbers]]
+  (loop [[n0 & nums] numbers squares []]
+    (if n0
+      (do
+          (def n2 (* n0 n0))
+          (recur nums (conj squares n2)))
+      squares
+      )))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (problem-11))
+  (println (square-numbers [1 2 3 4])))
+
