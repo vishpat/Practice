@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo-service 
+  labels:
+    app: echo-service 
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 8989
+    targetPort: 8080
+  selector:
+    app: echo-server 
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: echo-server 
+spec:
+  replicas: 3 
+  template:
+    metadata:
+      labels:
+        app: echo-server 
+    spec:
+      containers:
+      - name: echo-srv 
+        image: vishpat/echo-env:v1.0  # or just image: redis
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+	env:
+	- name: ECHO
+	  value: Akruty 
+        ports:
+        - containerPort: 8080 
