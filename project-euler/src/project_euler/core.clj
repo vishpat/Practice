@@ -13,8 +13,8 @@
     [m n]
   (loop [num1 m num2 n index 0 carry 0 result ""]
     (cond
-      (>= index (count num1)) result
-      (>= index (count num2)) result
+      (>= index (count num1)) (result) 
+      (>= index (count num2)) (result)
       (let [d1 (digit-at num1 index)  
           d2 (digit-at num2 index)
           total (+ d1 d2 carry) 
