@@ -13,14 +13,15 @@
     [m n]
   (loop [num1 m num2 n index 0 carry 0 result ""]
     (cond
-      (>= index (count num1)) (result) 
-      (>= index (count num2)) (result)
+      (>= index (count num1)) (str (.substring num2 0 (- (count num2) index)) result) 
+      (>= index (count num2)) (str (.substring num1 0 (- (count num1) index)) result)
+      :else 
       (let [d1 (digit-at num1 index)  
           d2 (digit-at num2 index)
           total (+ d1 d2 carry) 
           result-digit (mod total 10)
-          next-carry (/ total 10)] 
-          (recur num1 num2 (+ index 1) next-carry (+ (str result-digit) result))  
+          next-carry (quot total 10)] 
+          (recur num1 num2 (+ index 1) next-carry (str (str result-digit) result))  
       )
     )
   )
