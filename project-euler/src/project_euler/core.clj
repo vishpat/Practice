@@ -16,8 +16,7 @@
     [m n]
   (loop [num1 m num2 n index 0 carry 0 result ""]
     (cond
-      (and (= carry 0) (>= index (count num1))) (str (.substring num2 0 (- (count num2) index)) result) 
-      (and (= carry 0) (>= index (count num2))) (str (.substring num1 0 (- (count num1) index)) result)
+      (and (>= index (count num1)) (>= index (count num2))) result
       :else 
       (let [d1 (digit-at num1 index)  
           d2 (digit-at num2 index)
