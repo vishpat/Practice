@@ -1,20 +1,23 @@
 (ns project-euler.core)
 
-(defn sub-1-str
-  [m n]
-  ()
-  )
-
 (defn digit-at
   [number index]
-  (Integer/parseInt (str (.charAt number (- (count number) (+ index 1))))))
+  (if (< index (count number))
+      (Integer/parseInt (str (.charAt number (- (count number) (+ index 1))))) 
+      0)
+  )
+
+(defn sub-1-str
+  [m]
+    (str (- (Integer/parseInt m) 1)) 
+)
 
 (defn add-str
     [m n]
   (loop [num1 m num2 n index 0 carry 0 result ""]
     (cond
-      (>= index (count num1)) (str (.substring num2 0 (- (count num2) index)) result) 
-      (>= index (count num2)) (str (.substring num1 0 (- (count num1) index)) result)
+      (and (= carry 0) (>= index (count num1))) (str (.substring num2 0 (- (count num2) index)) result) 
+      (and (= carry 0) (>= index (count num2))) (str (.substring num1 0 (- (count num1) index)) result)
       :else 
       (let [d1 (digit-at num1 index)  
           d2 (digit-at num2 index)
@@ -26,15 +29,15 @@
     )
   )
 )
-;
-;
-;(defn multiply-str
-;  [m n]
-;  (loop [num1 m num2 n result ""]
-;    (cond (= num1 "0") "0" (= num2 "0") "0" (= num1 "1") (add-str result num2) 
-;          :else (recur (sub-str num1 "1") num2 (add-str result num2)))  
-;  )
-;)
+
+(defn multiply-str
+  [m n]
+  (loop [num1 m num2 n result ""]
+    (cond (= num1 "0") "0" (= num2 "0") "0" (= num1 "1") (add-str result num2) 
+          :else (recur (sub-1-str num1) num2 (add-str result num2)))  
+  )
+)
+
 ;
 ;(defn factorial
 ;  [n]
