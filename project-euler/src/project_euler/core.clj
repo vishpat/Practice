@@ -16,7 +16,7 @@
     [m n]
   (loop [num1 m num2 n index 0 carry 0 result ""]
     (cond
-      (and (>= index (count num1)) (>= index (count num2))) result
+      (and (>= index (count num1)) (>= index (count num2))) (str (if (not= carry 0) carry "") result)
       :else 
       (let [d1 (digit-at num1 index)  
           d2 (digit-at num2 index)
@@ -37,16 +37,17 @@
   )
 )
 
-;
-;(defn factorial
-;  [n]
-;  (
-;   loop [x n result 1] 
-;   (if (= x 1) result ( recur (- x 1) (* x result))
-;   )
-;  )
-;)
-;(defn -main
-;  "I don't do a whole lot ... yet."
-;  [& args]
-;  (println (multiply-str 10 9)))
+
+(defn factorial
+  [n]
+  (
+   loop [x n result "1"] 
+   (if (= x "1") result ( recur (sub-1-str x) (multiply-str x result))
+   )
+  )
+)
+
+(defn problem-20
+  []
+  (reduce + (map #(Integer/parseInt %) (map str (seq (factorial "100")))))
+  )
