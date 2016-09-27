@@ -3,5 +3,5 @@
 
 (defn problem-20
   []
-  (reduce + (map #(Integer/parseInt %) (map str (seq (util/factorial "100")))))
+  (reduce + (map #(Integer/parseInt %) (map str (seq (util/str-num-factorial "100")))))
   )
