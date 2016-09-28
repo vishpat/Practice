@@ -1,5 +1,7 @@
 (ns project-euler.core
-  (require [project-euler.util :as util]))
+  (require [project-euler.util :as util]
+           [project-euler.problem13 :as problem13]
+           ))
 
 (defn problem-20
   []
