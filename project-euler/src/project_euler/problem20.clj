@@ -1,4 +1,4 @@
-(ns project-euler.util)
+(ns project-euler.problem20)
 
 (defn str-num-digit-at
   [number index]
@@ -46,3 +46,8 @@
    )
   )
 )
+
+(defn solve
+  []
+  (reduce + (map #(Integer/parseInt %) (map str (seq (util/str-num-factorial "100")))))
+  )

@@ -1,9 +1,6 @@
 (ns project-euler.core
-  (require [project-euler.util :as util]
+  (require [project-euler.problem20 :as problem20]
            [project-euler.problem13 :as problem13]
            ))
 
-(defn problem-20
-  []
-  (reduce + (map #(Integer/parseInt %) (map str (seq (util/str-num-factorial "100")))))
-  )
+
