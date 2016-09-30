@@ -49,5 +49,5 @@
 
 (defn solve
   []
-  (reduce + (map #(Integer/parseInt %) (map str (seq (util/str-num-factorial "100")))))
+  (reduce + (map #(Integer/parseInt %) (map str (seq (str-num-factorial "100")))))
   )
