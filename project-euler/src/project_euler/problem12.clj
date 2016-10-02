@@ -10,7 +10,7 @@
   []
   (loop [num 1]
    (let [triangle-num (triangle-number num) divisors (util/get-all-factors triangle-num) divisor-count (count divisors)]
-     (if (= divisor-count 50) num
+     (if (>= divisor-count 500) num
        (recur (+ num 1)))
    )
   )
