@@ -1,6 +1,12 @@
 (ns project-euler.problem12
   (require [project-euler.util :as util]))
 
+(defn divisor-cnt
+  [n]
+  (
+   )
+  )
+
 (defn solve
   []
   (loop [triangle-num 1 index 1]
