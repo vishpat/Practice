@@ -3,5 +3,5 @@
 
 (defn solve
   []
-  (reduce + (map #(Integer/parseInt %) (map str (seq (util/str-num-factorial "100")))))
+  (util/calculate-str-num-digit-sum (util/str-num-factorial "100"))
   )

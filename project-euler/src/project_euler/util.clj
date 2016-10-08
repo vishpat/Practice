@@ -45,6 +45,22 @@
    )
   )
 )
+
+(defn str-2-pow-n
+  [n]
+  (loop [product "1" index 0]
+    (if (= index n) product
+      (recur (str-num-add product product) (inc index))
+    )
+   )
+  )
+
+(defn calculate-str-num-digit-sum
+  [str-num]
+  (reduce + (map #(Integer/parseInt %) (map str (seq str-num))))
+  )
+
+
 (defn get-prime-factors
   [n]
   (loop [num n factor 2 factors '()]
