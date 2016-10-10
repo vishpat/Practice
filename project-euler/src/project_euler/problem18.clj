@@ -8,21 +8,21 @@
 (defn get-data-val
   [x y]
   (let [ret (get @data (list x y))]
-    (if (nil? ret) 0 ret)
+    (if (nil? ret) -1 ret)
     )
   )
 
 (defn get-left-child-data
   [x y]
   (let [ret (get @data (list x (inc y)))]
-    (if (nil? ret) 0 ret)
+    (if (nil? ret) -1 ret)
     )
 )
 
 (defn get-right-child-data
   [x y]
   (let [ret (get @data (list (inc x) (inc y)))]
-    (if (nil? ret) 0 ret)
+    (if (nil? ret) -1 ret)
     )
 )
 
@@ -66,8 +66,8 @@
                   next-max-total (max max-total left-child-total right-child-total)]
               (do
                 (swap! stack pop)
-                (when (not= 0 (get-data-val tos-x next-y)) (swap! stack conj left-child))
-                (when (not= 0 (get-data-val next-x next-y)) (swap! stack conj right-child))
+                (when (not= -1 left-child-val) (swap! stack conj left-child))
+                (when (not= -1 right-child-val) (swap! stack conj right-child))
                 (recur next-max-total))        
               )
           )
