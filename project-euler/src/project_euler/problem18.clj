@@ -2,7 +2,23 @@
  (:require [clojure.java.io :as io]) )
 
 (def data (atom {}))
+(def total-tree (atom {}))
 (def line-cnt (atom 0))
+
+(defn get-data-val
+  [x y]
+  (get @data (x y))
+  )
+
+(defn get-left-child-data
+  [x y]
+  (get @data (x (inc y)))
+)
+
+(defn get-left-child-data
+  [x y]
+  (get @data ((inc x) (inc y)))
+)
 
 (defn read-data-file
   [data-file]
@@ -24,20 +40,39 @@
   )
 )
 
+(defn bfs
+  []
+  (let [stack (atom (vec (list 0 0 (get-data-val 0 0))))]
+    (loop [stack (vec (list 0 0 (get-data-val 0 0))) max-total 0]
+      (if (= 0 (count stack)) max-total
+            (let [tos (nth stack 0)
+                  tos-x (nth tos 0)
+                  tos-y (nth tos 1)
+                  tos-total (nth tos 2)
+                  next-x (inc x)
+                  next-y (inc y)
+                  left-child-val (get-left-child-data tos-x next-y)
+                  left-child-total (+ tos-total left-child-val)
+                  right-child-val (get-left-child-data next-x next-y)
+                  right-child-total (+ tos-total right-child-val)
+                  left-child (list tos-x next-y left-child-total) 
+                  right-child (list next-x next-y right-child-total)
+                  next-max-total (max max-total left-child-total right-child-total)]
+              (do
+              (when (some? (get-data-val tos-x next-y)) (conj stack left-child))
+              (when (some? (get-data-val next-x next-y)) (conj stack right-child))
+              (recur next-max-total))        
+              )
+      )
+
+      )
+   )
+)
+
 (defn solve
   []
   (do
     (read-data-file "problem18.txt")
-    (loop [x 0 y 0 max-total (get @data (list 0 0))]
-      (do
-      (let [left-child-total  (if (< y (- @line-cnt 1)) (+ max-total (get @data (list x (inc y)))) 0) 
-            right-child-total (if (< y (- @line-cnt 1)) (+ max-total (get @data (list (inc x) (inc y)))) 0)] 
-            (cond (= y  (- @line-cnt 1)) max-total
-                  (> left-child-total right-child-total) (recur x (inc y) left-child-total)
-                  :else (recur (inc x) (inc y) right-child-total)
-          )
-        )
-      )
-    )
+    (bfs)  
   )
 )
