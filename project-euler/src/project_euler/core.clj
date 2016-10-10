@@ -1,3 +1,3 @@
 (ns project-euler.core
-  (require [project-euler.problem18 :as problem18]
+  (require [project-euler.problem21 :as problem21]
            [project-euler.util :as util]))
