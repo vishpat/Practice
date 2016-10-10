@@ -7,17 +7,23 @@
 
 (defn get-data-val
   [x y]
-  (get @data (x y))
+  (let [ret (get @data (list x y))]
+    (if (nil? ret) 0 ret)
+    )
   )
 
 (defn get-left-child-data
   [x y]
-  (get @data (x (inc y)))
+  (let [ret (get @data (list x (inc y)))]
+    (if (nil? ret) 0 ret)
+    )
 )
 
-(defn get-left-child-data
+(defn get-right-child-data
   [x y]
-  (get @data ((inc x) (inc y)))
+  (let [ret (get @data (list (inc x) (inc y)))]
+    (if (nil? ret) 0 ret)
+    )
 )
 
 (defn read-data-file
@@ -40,31 +46,31 @@
   )
 )
 
-(defn bfs
+(defn dfs
   []
-  (let [stack (atom (vec (list 0 0 (get-data-val 0 0))))]
-    (loop [stack (vec (list 0 0 (get-data-val 0 0))) max-total 0]
-      (if (= 0 (count stack)) max-total
-            (let [tos (nth stack 0)
+  (let [stack (atom (list (list 0 0 (get-data-val 0 0))))]
+    (loop [max-total 0]
+      (if (= 0 (count @stack)) max-total
+            (let [tos (nth @stack 0)
                   tos-x (nth tos 0)
                   tos-y (nth tos 1)
                   tos-total (nth tos 2)
-                  next-x (inc x)
-                  next-y (inc y)
-                  left-child-val (get-left-child-data tos-x next-y)
+                  next-x (inc tos-x)
+                  next-y (inc tos-y)
+                  left-child-val (get-left-child-data tos-x tos-y)
                   left-child-total (+ tos-total left-child-val)
-                  right-child-val (get-left-child-data next-x next-y)
+                  right-child-val (get-right-child-data tos-x tos-y)
                   right-child-total (+ tos-total right-child-val)
                   left-child (list tos-x next-y left-child-total) 
                   right-child (list next-x next-y right-child-total)
                   next-max-total (max max-total left-child-total right-child-total)]
               (do
-              (when (some? (get-data-val tos-x next-y)) (conj stack left-child))
-              (when (some? (get-data-val next-x next-y)) (conj stack right-child))
-              (recur next-max-total))        
+                (swap! stack pop)
+                (when (not= 0 (get-data-val tos-x next-y)) (swap! stack conj left-child))
+                (when (not= 0 (get-data-val next-x next-y)) (swap! stack conj right-child))
+                (recur next-max-total))        
               )
-      )
-
+          )
       )
    )
 )
@@ -73,6 +79,6 @@
   []
   (do
     (read-data-file "problem18.txt")
-    (bfs)  
+    (dfs)  
   )
 )
