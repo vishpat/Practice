@@ -6,17 +6,10 @@
 (defn init-combinations
   []
   (loop [amount 1]
-    (when (<= amount 200) 
-      (do 
-        (map #(let [amount-combinations (get @combinations amount)
-                      coin-count (quot amount %)] 
-                  (println % amount coin-count)
-                  (when (= (mod amount %) 0) 
-                    (assoc @combinations (+ amount-combinations coin-count)))) 
-               coins)
+    (when (<= amount 200)
+          (swap! combinations assoc amount (reduce + (map #(if (= 0 (mod amount %)) (quot amount %) 0) coins))) 
           (recur (inc amount)))
    )
-  )
 )
 
 (defn solve
