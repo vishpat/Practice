@@ -8,7 +8,11 @@
   (loop [amount 1]
     (when (<= amount 200) 
       (do 
-        (map #(println amount %) 
+        (map #(let [amount-combinations (get @combinations amount)
+                      coin-count (quot amount %)] 
+                  (println % amount coin-count)
+                  (when (= (mod amount %) 0) 
+                    (assoc @combinations (+ amount-combinations coin-count)))) 
                coins)
           (recur (inc amount)))
    )
