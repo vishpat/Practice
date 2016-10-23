@@ -5,7 +5,7 @@
   [data-file]
   (with-open [rdr (io/reader data-file)]
     (doseq [line (line-seq rdr)]
-      (clojure.string/split line #",")
+      (println (clojure.string/split line #","))
       )      
     )
   )
