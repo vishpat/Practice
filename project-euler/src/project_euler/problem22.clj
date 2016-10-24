@@ -12,8 +12,14 @@
   [data-file]
   (with-open [rdr (io/reader data-file)]
     (doseq [line (line-seq rdr)]
-      (println (map name-score (map #(cstr/replace % "\"" "" ) 
-                                    (sort (cstr/split line #",")))))
+      (let [scores (map name-score (map #(cstr/replace % "\"" "" ) 
+                                    (sort (cstr/split line #","))))
+            max-names (count scores)]
+          (loop [total-score 0 index 0] 
+            (if (>= index max-names) total-score
+              (recur (+ total-score (* (inc index) (nth scores index))) (inc index)))
+            )
+        )
       )      
     )
   )
