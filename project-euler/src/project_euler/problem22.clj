@@ -2,11 +2,18 @@
  (:require [clojure.java.io :as io])
  (:require [clojure.string :as cstr]))
 
+(defn name-score
+  [n]
+  (reduce + (map #(inc (- (int %) (int \A))) n))
+  )
+
+
 (defn load-data
   [data-file]
   (with-open [rdr (io/reader data-file)]
     (doseq [line (line-seq rdr)]
-      (println (map #(cstr/replace % "\"" "" ) (sort (cstr/split line #","))))
+      (println (map name-score (map #(cstr/replace % "\"" "" ) 
+                                    (sort (cstr/split line #",")))))
       )      
     )
   )
