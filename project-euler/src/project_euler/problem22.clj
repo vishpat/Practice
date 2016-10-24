@@ -16,7 +16,7 @@
                                     (sort (cstr/split line #","))))
             max-names (count scores)]
           (loop [total-score 0 index 0] 
-            (if (>= index max-names) total-score
+            (if (>= index max-names) (println total-score)
               (recur (+ total-score (* (inc index) (nth scores index))) (inc index)))
             )
         )
