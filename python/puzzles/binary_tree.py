@@ -30,14 +30,24 @@ class node(object):
 
         f(self._value)
 
+    def height(self):
+        left_height = 0 if self._left is None else 1 + self._left.height()
+        right_height = 0 if self._right is None else 1 + self._right.height()
+        return max(left_height, right_height)
+
+    def is_balanced(self):
+        left_height = 0 if self._left is None else 1 + self._left.height()
+        right_height = 0 if self._right is None else 1 + self._right.height()
+        return left_height == right_height
+
 
 def print_func(x):
     print(x)
 
 
 if __name__ == "__main__":
-    root = node(2)
-    for e in [8, 5, 6, 3, 10, 12, 14]:
+    root = node(8)
+    for e in [5, 6, 3, 10, 12]:
         root.add_child(e)
 
-    root.dfs_visit(print_func)
+    print(root.is_balanced())
