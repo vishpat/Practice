@@ -9,7 +9,7 @@ def problem_sum(input, s):
     wsum = input[0]
 
     while start_idx + wsize <= len(input):
-        print(f'start {start_idx} wsize {wsize} wsum {wsum}')
+        
         if wsum == s:
             return start_idx + 1, start_idx + wsize
 
@@ -19,9 +19,13 @@ def problem_sum(input, s):
             wsize -= 1
         else:
             wsize += 1
+            if start_idx + wsize > len(input):
+                return -1, -1
+
             wsum += input[start_idx + wsize - 1]
 
     return -1, -1
+
 
 
 if __name__ == "__main__":
