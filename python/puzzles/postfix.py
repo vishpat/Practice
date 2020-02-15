@@ -37,6 +37,10 @@ class TokenType(Enum):
         return TokenType.INVALID
 
     @staticmethod
+    def isbinoperator(x):
+        return True if x == '+' or x == '-' or x == '*' or x == '/' else False
+
+    @staticmethod
     def isoperater(x):
         return True if x == '+' or x == '-' or x == '*' or x == '/' else False
 
@@ -133,5 +137,35 @@ def infix2postfix(infix: str):
     return post_fix
 
 
+def eval(postfix: str):
+    stack = Stack()
+    for x in postfix:
+        token = Token(x)
+
+        if TokenType.type(token.val) == TokenType.NUM:
+            stack.push(token)
+
+        if TokenType.isbinoperator(token.val):
+            op2 = stack.pop().val
+            op1 = stack.pop().val
+            val = 0
+            if token.val == '+':
+                val = int(op1) + int(op2)
+
+            if token.val == '-':
+                val = int(op1) - int(op2)
+
+            if token.val == '*':
+                val = int(op1) * int(op2)
+
+            if token.val == '/':
+                val = int(op1) / int(op2)
+
+            stack.push(Token(str(val)))
+
+    return int(stack.pop().val)
+
+
 if __name__ == "__main__":
-    print(infix2postfix("(1 + 2*3 - 4*5)"))
+    postfix = infix2postfix("(1 + 3*2 + 2*(3 - 4*5))")
+    print(eval(postfix))
