@@ -30,6 +30,8 @@ def max_value_child(W, items, indices):
         item = items[idx]
         return item.v
 
+    w = sum(map(lambda idx: items[idx].w, indices))
+
     for i in range(0, len(indices)):
         sub_indices = []
         for j in range(0, len(indices)):
@@ -38,13 +40,11 @@ def max_value_child(W, items, indices):
 
         item = items[indices[i]]
         v = max_value_child(W, items, sub_indices)
-        w = sum(map(lambda idx: items[idx].w, sub_indices))
 
-        if w + item.w <= W:
+        if w <= W:
             max_val = item.v + v
-
-        if max_val > max_knapsack_val:
-            max_knapsack_val = max_val
+            if max_val > max_knapsack_val:
+                max_knapsack_val = max_val
 
     max_knapsack[key] = max_val
     return max_val
