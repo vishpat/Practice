@@ -1,4 +1,4 @@
-def lcs(arr):
+def lis(arr):
     max_seq = [1 for _ in range(0, len(arr))]
     lcs_max_len = 1
     for i in range(0, len(arr)):
@@ -9,4 +9,4 @@ def lcs(arr):
     return lcs_max_len
 
 if __name__ == "__main__":
-    print(lcs([50, 3, 10, 7, 40, 80]))
+    print(lis([50, 3, 10, 7, 40, 80]))
