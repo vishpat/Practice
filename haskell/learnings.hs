@@ -13,6 +13,10 @@ areaOfACircle r = 3.14 *r*r
 convertUppercase :: [Char] -> [Char]
 convertUppercase xs = [toUpper x | x <- xs]
 
+
+length' :: (Num b) => [a] -> b 
+length' xs = sum [1 | x <- xs ]
+
 -- String to dataype
 read "6" :: Int
 read "7.0" :: Float
