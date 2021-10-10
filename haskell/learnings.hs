@@ -12,3 +12,8 @@ areaOfACircle r = 3.14 *r*r
 
 convertUppercase :: [Char] -> [Char]
 convertUppercase xs = [toUpper x | x <- xs]
+
+-- Type casting
+read "6" :: Int
+read "7.0" :: Float
+
