@@ -23,3 +23,7 @@ read "7.0" :: Float
 
 -- Type casting
 20 :: Float
+
+-- Convert values to Strings
+let x = read "6" :: Int -- x contains an Integer
+show x -- This will convert the integer to a string
