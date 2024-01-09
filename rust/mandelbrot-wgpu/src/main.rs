@@ -36,7 +36,7 @@ async fn gpu_device_queue() -> (wgpu::Device, wgpu::Queue) {
 
 async fn compute_shader(device: &wgpu::Device) -> wgpu::ShaderModule {
     device.create_shader_module(wgpu::ShaderModuleDescriptor {
-        label: Some("MandelBrot Fragment Shader"),
+        label: Some("MandelBrot Compute Shader"),
         source: wgpu::ShaderSource::Wgsl(include_str!("mandelbrot.wgsl").into()),
     })
 }
