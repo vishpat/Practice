@@ -1,6 +1,6 @@
-use ndarray::Array2;
+use ndarray::{Array2, Zip};
 
-const WIDTH: u32 = 10000;
+const WIDTH: u32 = 64*512;
 const HEIGHT: u32 = WIDTH;
 const X: f64 = -0.65;
 const Y: f64 = 0.0;
@@ -33,9 +33,12 @@ fn pixel_color(row: u32, col: u32) -> u32 {
 }
 
 fn main() {
-    let pixels = Array2::<u32>::from_shape_fn((HEIGHT as usize, WIDTH as usize), |(row, col)| {
-        pixel_color(row as u32, col as u32)
-    });
+    let mut pixels = Array2::<u32>::zeros((HEIGHT as usize, WIDTH as usize));
+    Zip::indexed(pixels.view_mut())
+        .par_for_each(|(row, col), pixel| {
+            *pixel = pixel_color(row as u32, col as u32);
+        }); 
+    
     let img = image::ImageBuffer::from_fn(WIDTH, HEIGHT, |col, row| {
         let pixel = pixels[[row as usize, col as usize]];
         image::Rgb([(pixel >> 16) as u8, (pixel >> 8) as u8, pixel as u8])
