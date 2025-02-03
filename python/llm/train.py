@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import math
-
+import os
 
 # Mapping for numeric month to string month
 month_names = [
@@ -324,8 +324,12 @@ criterion = nn.CrossEntropyLoss(ignore_index=output_vocab_to_idx['<PAD>'])
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
+# Define path to save weights
+MODEL_PATH = 'date_transformer_model.pth'
+
 # Training Loop
 def train():
+    best_val_loss = float('inf')
     for epoch in range(num_epochs):
         model.train() # Set the model to training mode
         total_loss = 0
@@ -356,6 +360,13 @@ def train():
                 total_val_loss += val_loss.item()
             avg_val_loss = total_val_loss/len(val_loader)
             print(f"Epoch: {epoch+1}/{num_epochs}, Validation Loss: {avg_val_loss:.4f}")
+
+            # Save the best model
+            if avg_val_loss < best_val_loss:
+                best_val_loss = avg_val_loss
+                torch.save(model.state_dict(), MODEL_PATH)
+                print(f"Model saved at epoch {epoch+1}")
+
 
 
 # Run training loop
@@ -407,6 +418,13 @@ def evaluate(model, test_loader, input_vocab_to_idx, input_idx_to_vocab, output_
             
     accuracy = (correct_predictions / total_predictions) * 100
     return accuracy
+
+# Load the best model weights
+if os.path.exists(MODEL_PATH):
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+    print("Loaded trained model from disk.")
+else:
+    print("No saved model found, please train the model first!")
 
 test_accuracy = evaluate(model, test_loader, input_vocab_to_idx, input_idx_to_vocab, output_vocab_to_idx, output_idx_to_vocab, device, max_len=max_len)
 print(f"Test Accuracy: {test_accuracy:.2f}%")
