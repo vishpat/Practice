@@ -9,6 +9,7 @@ import torch.nn.functional as F
 from torchview import draw_graph
 import math
 import os
+import tiktoken
 
 # Initialize Hyperparameters
 embed_dim = 128
@@ -19,8 +20,24 @@ dropout = 0.1
 learning_rate = 0.0001
 num_epochs = 20
 batch_size = 64
+max_len = 20
 # Move model to device if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+cl100k_base = tiktoken.get_encoding("cl100k_base")
+enc = tiktoken.Encoding(
+    name="cl100k_im",
+    pat_str=cl100k_base._pat_str,
+    mergeable_ranks=cl100k_base._mergeable_ranks,
+    special_tokens={
+        **cl100k_base._special_tokens,
+        "<SOS>": 100264,
+        "<EOS>": 100265,
+        "<PAD>": 100266,
+    },
+)
+vocab_size = enc.n_vocab
+special_tokens = {"<SOS>", "<EOS>", "<PAD>"}
 
 month_names = [
     "January",
@@ -58,65 +75,31 @@ def generate_date_pairs(num_samples):
     return date_pairs
 
 
-def create_vocab(date_pairs):
-    """Creates vocabulary based on the data."""
-    input_vocab = set()
-    output_vocab = set()
-
-    for inp, out in date_pairs:
-        for char in inp:
-            input_vocab.add(char)
-        for char in out:
-            output_vocab.add(char)
-
-    input_vocab = sorted(list(input_vocab))
-    output_vocab = sorted(list(output_vocab))
-
-    # Add special tokens
-    input_vocab = ["<PAD>", "<SOS>", "<EOS>"] + input_vocab
-    output_vocab = ["<PAD>", "<SOS>", "<EOS>"] + output_vocab
-
-    input_vocab_to_idx = {token: idx for idx, token in enumerate(input_vocab)}
-    input_idx_to_vocab = {idx: token for idx, token in enumerate(input_vocab)}
-    output_vocab_to_idx = {token: idx for idx, token in enumerate(output_vocab)}
-    output_idx_to_vocab = {idx: token for idx, token in enumerate(output_vocab)}
-
-    return (
-        input_vocab_to_idx,
-        input_idx_to_vocab,
-        output_vocab_to_idx,
-        output_idx_to_vocab,
-    )
-
-
 class DateDataSet(Dataset):
-    def __init__(self, date_pairs, input_vocab_to_idx, output_vocab_to_idx, max_len=20):
+    def __init__(self, date_pairs, max_len=20):
         self.max_len = max_len
         self.date_pairs = date_pairs
-        self.input_vocab_to_idx = input_vocab_to_idx
-        self.output_vocab_to_idx = output_vocab_to_idx
 
     def __len__(self):
         return len(self.date_pairs)
 
     def __getitem__(self, idx):
         input_date, output_date = self.date_pairs[idx]
-        input_tensor = self.tensorize(input_date, self.input_vocab_to_idx)
-        output_tensor = self.tensorize(output_date, self.output_vocab_to_idx)
+        input_tensor = self.tensorize(input_date)
+        output_tensor = self.tensorize(output_date)
         return input_tensor, output_tensor
 
-    def tensorize(self, date_str, vocab_to_idx):
-        tensor = [vocab_to_idx["<SOS>"]]
-        for char in date_str:
-            tensor.append(vocab_to_idx[char])
-        tensor.append(vocab_to_idx["<EOS>"])
-        tensor += [vocab_to_idx["<PAD>"]] * (self.max_len - len(tensor))
-        return torch.tensor(tensor).to(device)
+    def tensorize(self, date_str):
+        data_str = f"<SOS>{date_str}<EOS>"
+        encodings = enc.encode(data_str, allowed_special=special_tokens)
+        for _ in range(len(encodings), self.max_len):
+            encodings.append(enc._special_tokens["<PAD>"])
+        return torch.tensor(encodings).to(device)
 
 
-def tensor_to_string(tensor, idx_to_vocab):
+def tensor_to_string(tensor):
     ids = tensor.cpu().numpy()
-    return "".join([idx_to_vocab[idx] for idx in ids])
+    return enc.decode(ids)
 
 
 class Embedding(nn.Module):
@@ -213,20 +196,58 @@ def validate_transformer(model, iterator, criterion):
     return epoch_loss / len(iterator)
 
 
-if __name__ == "__main__":
-    date_pairs = generate_date_pairs(20000)
-    input_vocab_to_idx, input_idx_to_vocab, output_vocab_to_idx, output_idx_to_vocab = (
-        create_vocab(date_pairs)
-    )
+def translate_date(date_str: str, model):
+    date_tensor = DateDataSet([(date_str, "")]).tensorize(date_str)
+    sos_token = enc._special_tokens["<SOS>"]
+    eos_token = enc._special_tokens["<EOS>"]
+    output = torch.tensor([[sos_token]]).to(device)
 
-    print("Input Vocab Size:", len(input_vocab_to_idx))
-    print("Output Vocab Size:", len(output_vocab_to_idx))
+    for i in range(20):
+        with torch.no_grad():
+            predictions = model(date_tensor, output)
+        predictions = predictions[:, -1:, :]
+        predicted_id = torch.argmax(predictions, dim=-1)
+        if predicted_id == eos_token:
+            break
+        output = torch.cat((output, predicted_id), dim=-1)
+
+    return tensor_to_string(output[0])
+
+
+date_file = "dates.txt"
+
+
+def load_date_pairs():
+    date_pairs = []
+    if os.path.exists(date_file):
+        print("Loading date pairs from file")
+        with open(date_file, "r") as f:
+            for line in f:
+                a, b, c = line.strip().split(",")
+                date_pairs.append(tuple((a, f"{b},{c}")))
+    else:
+        date_pairs = generate_date_pairs(20000)
+        print("Saving date pairs to file")
+        with open(date_file, "w") as f:
+            for pair in date_pairs:
+                f.write(f"{pair[0]},{pair[1]}\n")
+    return date_pairs
+
+
+if __name__ == "__main__":
+    date_pairs = load_date_pairs()
+    print("Number of date pairs:", len(date_pairs))
+    for i in range(5):
+        print(date_pairs[i])
+
+    print("Input Vocab Size:", enc.n_vocab)
+    print("Output Vocab Size:", enc.n_vocab)
 
     train_set, test_set = train_test_split(date_pairs, test_size=0.2, train_size=0.8)
     test_set, val_set = train_test_split(test_set, test_size=0.5, train_size=0.5)
-    train_dataset = DateDataSet(train_set, input_vocab_to_idx, output_vocab_to_idx)
-    val_dataset = DateDataSet(val_set, input_vocab_to_idx, output_vocab_to_idx)
-    test_dataset = DateDataSet(test_set, input_vocab_to_idx, output_vocab_to_idx)
+    train_dataset = DateDataSet(train_set)
+    val_dataset = DateDataSet(val_set)
+    test_dataset = DateDataSet(test_set)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
@@ -234,8 +255,8 @@ if __name__ == "__main__":
 
     # Initialize the model
     model = TransFormer(
-        len(input_vocab_to_idx),
-        len(output_vocab_to_idx),
+        vocab_size,
+        vocab_size,
         embed_dim,
         num_heads,
         hidden_dim,
@@ -244,21 +265,25 @@ if __name__ == "__main__":
     )
 
     model.to(device)
-    criterion = nn.CrossEntropyLoss(ignore_index=output_vocab_to_idx["<PAD>"])
+    criterion = nn.CrossEntropyLoss(ignore_index=enc._special_tokens["<PAD>"])
 
     # Initialize the optimizer
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    best_val_loss = float("inf")
-    for epoch in range(num_epochs):
-        train_loss = train_transformer(model, train_loader, optimizer, criterion)
-        print(f"Epoch: {epoch + 1}, Train Loss: {train_loss}")
-        val_loss = validate_transformer(model, val_loader, criterion)
-        print(f"Epoch: {epoch + 1}, Validation Loss: {val_loss}")
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            torch.save(model.state_dict(), "date_translator.pth")
+    if not os.path.exists("date_translator.pth"):
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+        best_val_loss = float("inf")
+        for epoch in range(num_epochs):
+            train_loss = train_transformer(model, train_loader, optimizer, criterion)
+            print(f"Epoch: {epoch + 1}, Train Loss: {train_loss}")
+            val_loss = validate_transformer(model, val_loader, criterion)
+            print(f"Epoch: {epoch + 1}, Validation Loss: {val_loss}")
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                torch.save(model.state_dict(), "date_translator.pth")
 
-    if os.path.exists("date_translator.pth"):
-        model.load_state_dict(torch.load("date_translator.pth"))
-        test_loss = validate_transformer(model, test_loader, criterion)
-        print(f"Test Loss: {test_loss}")
+    model.load_state_dict(torch.load("date_translator.pth"))
+    test_loss = validate_transformer(model, test_loader, criterion)
+    print(f"Test Loss: {test_loss}")
+    rand_idx = random.randint(0, len(train_dataset.date_pairs))
+    input_date, output_date = train_dataset.date_pairs[rand_idx]
+    print(f"{input_date} {output_date}")
+    print(translate_date(input_date, model))
