@@ -18,7 +18,7 @@ num_layers = 4
 dropout = 0.1
 learning_rate = 0.0001
 num_epochs = 20
-batch_size = 64 
+batch_size = 64
 # Move model to device if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -182,6 +182,7 @@ class TransFormer(nn.Module):
         output = self.fc(output)
         return output
 
+
 def train_transformer(model, iterator, optimizer, criterion):
     model.train()
     epoch_loss = 0
@@ -196,6 +197,7 @@ def train_transformer(model, iterator, optimizer, criterion):
         optimizer.step()
         epoch_loss += loss.item()
     return epoch_loss / len(iterator)
+
 
 def validate_transformer(model, iterator, criterion):
     model.eval()
@@ -240,18 +242,18 @@ if __name__ == "__main__":
         num_layers,
         dropout,
     )
-    
+
     model.to(device)
     criterion = nn.CrossEntropyLoss(ignore_index=output_vocab_to_idx["<PAD>"])
-    
+
     # Initialize the optimizer
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     best_val_loss = float("inf")
     for epoch in range(num_epochs):
         train_loss = train_transformer(model, train_loader, optimizer, criterion)
-        print(f"Epoch: {epoch+1}, Train Loss: {train_loss}")
+        print(f"Epoch: {epoch + 1}, Train Loss: {train_loss}")
         val_loss = validate_transformer(model, val_loader, criterion)
-        print(f"Epoch: {epoch+1}, Validation Loss: {val_loss}")
+        print(f"Epoch: {epoch + 1}, Validation Loss: {val_loss}")
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             torch.save(model.state_dict(), "date_translator.pth")
