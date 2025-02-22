@@ -342,7 +342,7 @@ def translate_date(model, input_date_str, device):
         trg_padding_mask = (trg_input == OUTPUT_PAD_IDX).to(device)
 
         output = model.decode(
-            trg_input, memory, trg_mask, trg_padding_mask, None, src_padding_mask
+            trg_input, memory, trg_mask, trg_padding_mask, None, None 
         )  # [1, current_trg_len, output_vocab_size]
         # Get the last predicted token distribution
         next_token_probs = output[:, -1, :]  # [1, output_vocab_size]
@@ -409,7 +409,7 @@ if __name__ == "__main__":
     input_date_examples = [
         "03/15/2023",
         "12/01/1999",
-        "01/01/2024",
+        "11/01/2024",
         "01/03/2013",
         "10/10/1985",
     ]
