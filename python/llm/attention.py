@@ -419,10 +419,4 @@ if __name__ == "__main__":
         print(
             f"Input Date: {input_date}, Predicted Output Date: {predicted_output_date}"
         )
-#    model.load_state_dict(torch.load("date_translator.pth"))
-#    test_loss = validate_transformer(model, test_loader, criterion)
-#    print(f"Test Loss: {test_loss}")
-#    rand_idx = random.randint(0, len(train_dataset.date_pairs))
-#    input_date, output_date = train_dataset.date_pairs[rand_idx]
-#    print(f"{input_date} {output_date}")
-#
+
