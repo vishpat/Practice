@@ -293,7 +293,7 @@ def validate_transformer(model, iterator, criterion):
                 None,
                 src_padding_mask,
                 trg_padding_mask,
-                src_padding_mask,
+                None,
             )
             output = output.contiguous().view(-1, model.output_vocab_size)
             tgt = tgt_output.contiguous().view(-1)
@@ -410,7 +410,7 @@ if __name__ == "__main__":
         "03/15/2023",
         "12/01/1999",
         "01/01/2024",
-        "09/30/2000",
+        "01/03/2013",
         "10/10/1985",
     ]
 
