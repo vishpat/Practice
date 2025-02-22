@@ -266,7 +266,7 @@ def train_transformer(model, iterator, optimizer, criterion):
             None,
             src_padding_mask,
             trg_padding_mask,
-            src_padding_mask,
+            None,
         )
         output = output.contiguous().view(-1, model.output_vocab_size)
         tgt = tgt_output.contiguous().view(-1)
