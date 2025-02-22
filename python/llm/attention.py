@@ -194,32 +194,6 @@ criterion = nn.CrossEntropyLoss(ignore_index=OUTPUT_PAD_IDX) # Ignore padding to
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 
-
-def remove_sos_add_pad(target_tensors, pad_token=OUTPUT_PAD_IDX):
-    """
-    Remove the <sos> token from batch padded target tensors and add a pad token at the end.
-
-    Args:
-        target_tensors (torch.Tensor): Batch of padded target tensors.
-            Shape: (batch_size, sequence_length)
-        pad_token (int, optional): The value to use for padding. Defaults to 0.
-
-    Returns:
-        torch.Tensor: Batch of target tensors with <sos> token removed and pad token added.
-            Shape: (batch_size, sequence_length)
-    """
-    # Remove the first token (assumed to be <sos>) from each sequence
-    without_sos = target_tensors[:, 1:]
-    
-    # Create a tensor of pad tokens with shape (batch_size, 1)
-    pad_column = torch.full((target_tensors.size(0), 1), pad_token, dtype=target_tensors.dtype, device=target_tensors.device)
-    
-    # Concatenate the pad column to the end of the sequences
-    result = torch.cat([without_sos, pad_column], dim=1)
-    
-    return result
-
-
 def train_epoch(model, dataloader, optimizer, criterion, device):
     model.train()
     total_loss = 0
