@@ -25,7 +25,7 @@ PAD = "<PAD>"
 SOS = "<SOS>"
 EOS = "<EOS>"
 
-# Mask out "/" token in the input
+# Mask out "/" token in the input since it does affect the output
 mask_tensor = torch.zeros((max_len))
 mask_tensor[3] = 1
 mask_tensor[6] = 1
@@ -261,8 +261,8 @@ def train_transformer(model, iterator, optimizer, criterion):
     model.train()
     epoch_loss = 0
     for _, (src, tgt) in enumerate(iterator):
-        tgt_input = tgt[:, :-1]
-        tgt_output = tgt[:, 1:]
+        tgt_output = tgt[:, 1:] # Remove <sos> token 
+        tgt_input = tgt[:, :-1]  
         src_mask, tgt_mask, src_padding_mask, trg_padding_mask = create_mask(
             src, tgt_input
         )
