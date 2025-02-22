@@ -25,6 +25,12 @@ PAD = "<PAD>"
 SOS = "<SOS>"
 EOS = "<EOS>"
 
+# Mask out "/" token in the input
+mask_tensor = torch.zeros((max_len))
+mask_tensor[3] = 1
+mask_tensor[6] = 1
+src_mask = mask_tensor.unsqueeze(1).to(device) * mask_tensor.unsqueeze(0).to(device)
+
 
 def generate_date_pairs(num_samples):
     """Generates date pairs in both input and output format."""
@@ -70,6 +76,7 @@ def create_vocab(date_pairs):
     input_idx_to_vocab = {idx: token for idx, token in enumerate(input_vocab)}
     output_vocab_to_idx = {token: idx for idx, token in enumerate(output_vocab)}
     output_idx_to_vocab = {idx: token for idx, token in enumerate(output_vocab)}
+
     return (
         input_vocab_to_idx,
         input_idx_to_vocab,
@@ -247,7 +254,7 @@ def create_mask(src, trg):
     )  # Decoder mask, prevents peeking
     src_padding_mask = src == input_vocab_to_idx[PAD]  # Mask padding tokens in source
     trg_padding_mask = trg == output_vocab_to_idx[PAD]  # Mask padding tokens in target
-    return trg_mask, src_padding_mask, trg_padding_mask
+    return src_mask, trg_mask, src_padding_mask, trg_padding_mask
 
 
 def train_transformer(model, iterator, optimizer, criterion):
@@ -256,12 +263,14 @@ def train_transformer(model, iterator, optimizer, criterion):
     for _, (src, tgt) in enumerate(iterator):
         tgt_input = tgt[:, :-1]
         tgt_output = tgt[:, 1:]
-        tgt_mask, src_padding_mask, trg_padding_mask = create_mask(src, tgt_input)
+        src_mask, tgt_mask, src_padding_mask, trg_padding_mask = create_mask(
+            src, tgt_input
+        )
         optimizer.zero_grad()
         output = model(
             src,
             tgt_input,
-            None,
+            src_mask,
             tgt_mask,
             None,
             src_padding_mask,
@@ -284,11 +293,13 @@ def validate_transformer(model, iterator, criterion):
         for _, (src, tgt) in enumerate(iterator):
             tgt_input = tgt[:, :-1]
             tgt_output = tgt[:, 1:]
-            tgt_mask, src_padding_mask, trg_padding_mask = create_mask(src, tgt_input)
+            src_mask, tgt_mask, src_padding_mask, trg_padding_mask = create_mask(
+                src, tgt_input
+            )
             output = model(
                 src,
                 tgt_input,
-                None,
+                src_mask,
                 tgt_mask,
                 None,
                 src_padding_mask,
@@ -329,7 +340,7 @@ def translate_date(model, input_date_str, device):
     )  # [1, input_seq_len]
     src_padding_mask = (input_tokens == INPUT_PAD_IDX).to(device)
 
-    memory = model.encode(input_tokens, None, src_padding_mask)  # Encode the source
+    memory = model.encode(input_tokens, src_mask, src_padding_mask)  # Encode the source
 
     trg_tokens = [OUTPUT_SOS_IDX]  # Start with <sos> token
     for _ in range(max_len):
@@ -342,7 +353,7 @@ def translate_date(model, input_date_str, device):
         trg_padding_mask = (trg_input == OUTPUT_PAD_IDX).to(device)
 
         output = model.decode(
-            trg_input, memory, trg_mask, trg_padding_mask, None, None 
+            trg_input, memory, trg_mask, trg_padding_mask, None, None
         )  # [1, current_trg_len, output_vocab_size]
         # Get the last predicted token distribution
         next_token_probs = output[:, -1, :]  # [1, output_vocab_size]
@@ -419,4 +430,3 @@ if __name__ == "__main__":
         print(
             f"Input Date: {input_date}, Predicted Output Date: {predicted_output_date}"
         )
-
